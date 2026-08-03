@@ -1,0 +1,23 @@
+---
+import { getLibraryLogo } from '../utils/logos';
+
+interface Props {
+  language: string;
+  library: string;
+  size?: 'sm' | 'md';
+}
+
+const { language, library, size = 'md' } = Astro.props;
+const logo = getLibraryLogo(language, library);
+const fallback = library.slice(0, 2).toUpperCase();
+---
+
+<span class:list={['library-logo', `library-logo--${size}`]} aria-hidden="true">
+  {logo ? (
+    <svg viewBox="0 0 24 24" role="img" aria-label={logo.title}>
+      <path d={logo.path} fill="currentColor" />
+    </svg>
+  ) : (
+    <span class="library-logo-fallback">{fallback}</span>
+  )}
+</span>

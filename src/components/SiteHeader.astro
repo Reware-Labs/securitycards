@@ -1,0 +1,50 @@
+---
+/**
+ * SiteHeader — sticky top bar shown on every page.
+ *
+ * Left: stacked "AI Code Security Skills / by RewareLabs" wordmark (→ /).
+ * Right: primary nav, the ⌘K search trigger
+ *        (styled as a mini input), and the theme toggle.
+ *
+ * The search trigger just opens the command palette (see command-palette.ts,
+ * which binds to [data-command-open]); the palette itself is rendered once by
+ * BaseLayout.
+ */
+import ThemeToggle from './ThemeToggle.astro';
+const pathname = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <!-- Brand -->
+    <a class="site-brand" href="/" aria-label="AI Code Security Cards by RewareLabs, home">
+      <span class="site-brand-name">AI Code Security Cards</span>
+      <span class="site-brand-byline">
+        <span>by</span>
+        <img class="site-brand-logo" src="/rewarelabs-logo.svg" alt="RewareLabs"
+             width="58" height="10" loading="eager" />
+      </span>
+    </a>
+
+    <!-- Right cluster -->
+    <div class="site-header-actions">
+      <nav class="site-nav" aria-label="Primary">
+        <a class="site-nav-link" href="/" aria-current={pathname === '/' ? 'page' : undefined}>Libraries</a>
+        <a class="site-nav-link" href="/integration" aria-current={pathname.startsWith('/integration') ? 'page' : undefined}>Integration</a>
+      </nav>
+
+      <button class="header-search" type="button" data-command-open
+              aria-label="Search cards" aria-keyshortcuts="Meta+K Control+K">
+        <svg class="header-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <path stroke-linecap="round" d="M21 21l-4.35-4.35" />
+        </svg>
+        <span class="header-search-label">Search cards…</span>
+        <kbd class="header-search-kbd"><span class="kbd-cmd">⌘</span>K</kbd>
+      </button>
+
+      <ThemeToggle />
+    </div>
+  </div>
+</header>

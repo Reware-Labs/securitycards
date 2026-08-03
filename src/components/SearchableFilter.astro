@@ -1,0 +1,118 @@
+---
+import '../styles/searchable-filter.css';
+
+interface Option {
+  value: string;
+  label: string;
+  searchText?: string;
+}
+
+interface Props {
+  id: string;
+  toggleLabel: string;
+  searchLabel: string;
+  searchPlaceholder: string;
+  optionsLabel: string;
+  allLabel: string;
+  emptyLabel: string;
+  options: Option[];
+  align?: 'left' | 'right';
+  wide?: boolean;
+}
+
+const {
+  id,
+  toggleLabel,
+  searchLabel,
+  searchPlaceholder,
+  optionsLabel,
+  allLabel,
+  emptyLabel,
+  options,
+  align = 'right',
+  wide = false,
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'filter-field',
+    'filter-combobox',
+    { 'filter-combobox--wide': wide, 'filter-combobox--align-left': align === 'left' },
+  ]}
+  id={`${id}-combobox`}
+  data-filter-combobox
+>
+  <input id={id} type="hidden" value="" data-filter-value />
+  <button
+    class="filter-select filter-combobox-toggle"
+    id={`${id}-toggle`}
+    type="button"
+    aria-label={toggleLabel}
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-controls={`${id}-popover`}
+    data-filter-toggle
+  >
+    <span data-filter-label>{allLabel}</span>
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path d="m6 8 4 4 4-4" />
+    </svg>
+  </button>
+  <div class="filter-combobox-popover" id={`${id}-popover`} data-filter-popover hidden>
+    <div class="filter-combobox-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
+      </svg>
+      <input
+        id={`${id}-search`}
+        type="search"
+        role="combobox"
+        placeholder={searchPlaceholder}
+        aria-label={searchLabel}
+        aria-autocomplete="list"
+        aria-controls={`${id}-options`}
+        aria-expanded="false"
+        autocomplete="off"
+        data-filter-search
+      />
+    </div>
+    <div
+      class="filter-combobox-options"
+      id={`${id}-options`}
+      role="listbox"
+      aria-label={optionsLabel}
+      data-filter-options
+    >
+      <button
+        class="filter-combobox-option"
+        id={`${id}-option-all`}
+        type="button"
+        role="option"
+        aria-selected="true"
+        data-value=""
+        data-label={allLabel}
+      >
+        <span class="filter-combobox-check" aria-hidden="true">✓</span>
+        <span>{allLabel}</span>
+      </button>
+      {options.map((option, index) => (
+        <button
+          class="filter-combobox-option"
+          id={`${id}-option-${index}`}
+          type="button"
+          role="option"
+          aria-selected="false"
+          data-value={option.value}
+          data-label={option.label}
+          data-search={option.searchText ?? option.label}
+        >
+          <span class="filter-combobox-check" aria-hidden="true">✓</span>
+          <span>{option.label}</span>
+        </button>
+      ))}
+    </div>
+    <p class="filter-combobox-empty" data-filter-empty hidden>{emptyLabel}</p>
+  </div>
+</div>

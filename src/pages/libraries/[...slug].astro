@@ -1,0 +1,325 @@
+---
+/**
+ * Library master-detail page.
+ *
+ * URL: /libraries/{language}/{library}/{versionSlug}/
+ *   e.g. /libraries/python/flask/3-1-3/
+ *
+ * Left pane  = a searchable, stacked list of the library's cards. The
+ *              Security Blueprint and the combined "All Categories" file
+ *              are pinned at the top and visually featured; the rest are
+ *              individual category cards, alphabetical.
+ * Right pane = the selected card's full content (swapped client-side), with
+ *              an optional "On this card" table of contents and prev/next
+ *              navigation to the neighbouring panels.
+ *
+ * getStaticPaths() builds one page per library/version group; the selection
+ * logic lives in src/scripts/library.ts.
+ */
+import { getCollection, render } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import { createSatteriMarkdownProcessor } from '@astrojs/markdown-satteri';
+import { access, readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CardActions from '../../components/CardActions.astro';
+import { getLanguageLabel } from '../../utils/language';
+import { humanize } from '../../utils/text';
+import { shikiConfig } from '../../utils/shiki';
+import { stripPreamble } from '../../loaders/cards';
+import { countMarkdownTokens } from '../../utils/tokens';
+import { encodePathSegments } from '../../utils/url.js';
+import '../../styles/detail.css';
+import '../../styles/library.css';
+
+const dataDir = fileURLToPath(new URL('../../../data', import.meta.url));
+
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getStaticPaths() {
+  const allCards = await getCollection('cards');
+
+  // Group by "language/library/versionSlug" (first 3 id segments)
+  const groups = new Map<string, typeof allCards>();
+  for (const card of allCards) {
+    const slug = card.id.split('/').slice(0, 3).join('/');
+    const list = groups.get(slug) ?? [];
+    list.push(card);
+    groups.set(slug, list);
+  }
+
+  return [...groups.entries()].map(([slug, cards]) => ({
+    params: { slug: encodePathSegments(slug) },
+    props:  { cards },
+  }));
+}
+
+const { cards } = Astro.props;
+const [routeLanguage, routeLibrary, routeVersionSlug] = cards[0].id.split('/');
+
+// Library metadata (from any card in the group)
+const { language, library, version } = cards[0].data;
+const langLabel = getLanguageLabel(language);
+
+interface Panel {
+  target:      string;
+  label:       string;    // left-nav button text
+  title:       string;    // right-pane heading
+  filename:    string;
+  featured:    boolean;
+  icon?:       'blueprint' | 'all';   // featured items get a small leading icon
+  rawMarkdown: string;
+  count?:      number;     // individual cards bundled in this category, for the left-nav badge
+  tokenCount:  number;
+  toc:         MarkdownHeading[];   // in-panel headings for the "On this card" TOC
+  Content?:    any;        // Astro component, for collection-backed panels
+  html?:       string;     // pre-rendered HTML, for the all-categories panel
+}
+
+// ── Security Blueprint (featured, from the content collection) ──────────
+const blueprintCard = cards.find(c => c.data.cardType === 'blueprint');
+let blueprintPanel: Panel | null = null;
+if (blueprintCard) {
+  const { Content, headings } = await render(blueprintCard);
+  blueprintPanel = {
+    target:      'blueprint',
+    label:       'Security blueprint',
+    title:       blueprintCard.data.title,
+    filename:    'security-blueprint.md',
+    featured:    true,
+    icon:        'blueprint',
+    rawMarkdown: blueprintCard.body ?? '',
+    tokenCount:  blueprintCard.data.tokenCount,
+    toc:         headings.filter(h => h.depth === 2),
+    Content,
+  };
+}
+
+// ── All Categories (featured, combined file outside the collection) ─────
+// data/{language}/{library}/{versionSlug}/1_all_categories.md is skipped by
+// the content loader (src/loaders/cards.ts) since it's a concatenation of
+// every category, not its own card — read and rendered directly here.
+const allCategoriesPath = `${dataDir}/${routeLanguage}/${routeLibrary}/${routeVersionSlug}/1_all_categories.md`;
+let allCategoriesPanel: Panel | null = null;
+if (await fileExists(allCategoriesPath)) {
+  const rawAllCategories = await readFile(allCategoriesPath, 'utf-8');
+  // This processor does NOT inherit the project markdown config, so Shiki is
+  // wired up explicitly here to keep the all-categories panel's code blocks in
+  // step with the collection-rendered panels.
+  const processor = await createSatteriMarkdownProcessor({ syntaxHighlight: 'shiki', shikiConfig });
+  const { code, metadata } = await processor.render(stripPreamble(rawAllCategories, 2));
+  allCategoriesPanel = {
+    target:      'all-categories',
+    label:       'All categories',
+    title:       `${library}: All Security Cards`,
+    filename:    'all-categories.md',
+    featured:    true,
+    icon:        'all',
+    rawMarkdown: rawAllCategories,
+    tokenCount:  countMarkdownTokens(rawAllCategories),
+    toc:         metadata.headings.filter(h => h.depth === 2),
+    html:        code,
+  };
+}
+
+// ── Individual category cards, alphabetical ──────────────────────────────
+const categoryCards = cards
+  .filter(c => c.data.cardType === 'single')
+  .sort((a, b) => a.data.category.localeCompare(b.data.category));
+
+const categoryPanels: Panel[] = await Promise.all(
+  categoryCards.map(async (card) => {
+    const { Content, headings } = await render(card);
+    return {
+      target:      card.data.category,
+      label:       humanize(card.data.category),
+      title:       card.data.title,
+      filename:    card.data.category + '.md',
+      featured:    false,
+      rawMarkdown: card.body ?? '',
+      tokenCount:  card.data.tokenCount,
+      count:       card.data.cardCount,
+      toc:         headings.filter(h => h.depth === 3),
+      Content,
+    };
+  }),
+);
+
+const panels: Panel[] = [
+  ...(blueprintPanel ? [blueprintPanel] : []),
+  ...(allCategoriesPanel ? [allCategoriesPanel] : []),
+  ...categoryPanels,
+];
+const featuredCount = panels.filter(p => p.featured).length;
+---
+
+<BaseLayout
+  title={`${library} ${version} - Security Cards`}
+  description={`Security review cards for ${library} ${version}.`}
+  analytics={{ pageType: 'library', library, language, version }}
+>
+
+  <div class="page-wrapper lib-page-wrapper">
+
+    <!-- Library heading -->
+    <header class="lib-header">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href={`/?language=${encodeURIComponent(language)}`}>{langLabel}</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span class="breadcrumb-current" aria-current="page">{library}</span>
+      </nav>
+      <h1>{library} <span class="lib-header-version">{version}</span></h1>
+    </header>
+
+    <!-- Master-detail layout -->
+    <div class="lib-layout">
+
+      <!-- Left: searchable card list. The toggle button below only renders
+           visibly at ≤768px (see library.css) — on mobile it collapses the
+           list into an accordion so the category list doesn't just dump
+           itself as a long stack above the content. -->
+      <nav class="lib-nav" aria-label="Cards in this library">
+        <button
+          class="lib-nav-toggle"
+          type="button"
+          id="lib-nav-toggle"
+          aria-expanded="true"
+          aria-controls="lib-nav-collapsible"
+        >
+          <span class="lib-nav-toggle-label" id="lib-nav-toggle-label">{panels[0]?.label ?? 'Categories'}</span>
+          <svg class="lib-nav-toggle-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+               viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M6 8L1 3h10z"/></svg>
+        </button>
+
+        <div class="lib-nav-collapsible" id="lib-nav-collapsible">
+          <div class="lib-search-wrapper">
+            <svg class="lib-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path stroke-linecap="round" d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              id="lib-search"
+              class="lib-search"
+              type="search"
+              placeholder="Filter cards…"
+              aria-label="Filter cards in this library"
+              autocomplete="off"
+            />
+          </div>
+
+          <ul class="lib-nav-list">
+            {panels.map((panel, i) => (
+              <>
+                <li>
+                  <button
+                    class:list={['lib-nav-item', { 'is-active': i === 0, 'lib-nav-item--featured': panel.featured }]}
+                    type="button"
+                    data-target={panel.target}
+                  >
+                    {panel.icon === 'blueprint' && (
+                      <svg class="lib-nav-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                    )}
+                    {panel.icon === 'all' && (
+                      <svg class="lib-nav-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                      </svg>
+                    )}
+                    <span class="lib-nav-copy">
+                      <span class="lib-nav-label">{panel.label}</span>
+                    </span>
+                    {panel.count !== undefined && panel.count > 1 && <span class="lib-nav-count" aria-label={`${panel.count} cards`}>{panel.count}</span>}
+                  </button>
+                </li>
+                {i === featuredCount - 1 && featuredCount > 0 && featuredCount < panels.length && (
+                  <li class="lib-nav-divider" aria-hidden="true"></li>
+                )}
+              </>
+            ))}
+          </ul>
+          <p class="lib-search-empty" id="lib-search-empty" hidden>No categories match this filter.</p>
+        </div>
+      </nav>
+
+      <!-- Right: card content panels -->
+      <div class="lib-detail">
+        {panels.map((panel, i) => {
+          const Content = panel.Content;
+          const prev = panels[i - 1];
+          const next = panels[i + 1];
+          return (
+            <section
+              class="lib-panel"
+              id={panel.target}
+              data-panel={panel.target}
+              hidden={i !== 0}
+            >
+              <article class="card-content">
+                <div class="card-content-header">
+                  <div>
+                    <h2 class="card-content-title">{panel.title}</h2>
+                    <p class="card-token-estimate" title="Counted from raw Markdown with the GPT-4o tokenizer">Approximately {panel.tokenCount.toLocaleString('en-US')} tokens</p>
+                  </div>
+                  <CardActions rawMarkdown={panel.rawMarkdown} filename={panel.filename} />
+                </div>
+
+                {panel.toc.length >= 3 && (
+                  <details class="card-toc">
+                    <summary class="card-toc-summary">On this card</summary>
+                    <ul class="card-toc-list">
+                      {panel.toc.map(h => (
+                        <li>
+                          <button class="card-toc-link" type="button" data-scroll-to={h.slug}>{h.text}</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+
+                {Content ? <Content /> : <Fragment set:html={panel.html} />}
+
+                <nav class="card-nav" aria-label="Card navigation">
+                  {prev ? (
+                    <button class="card-nav-btn card-nav-prev" type="button" data-target={prev.target}>
+                      <span class="card-nav-dir">← Previous</span>
+                      <span class="card-nav-title">{prev.label}</span>
+                    </button>
+                  ) : <span />}
+                  {next ? (
+                    <button class="card-nav-btn card-nav-next" type="button" data-target={next.target}>
+                      <span class="card-nav-dir">Next →</span>
+                      <span class="card-nav-title">{next.label}</span>
+                    </button>
+                  ) : <span />}
+                </nav>
+              </article>
+            </section>
+          );
+        })}
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../../scripts/library.ts"></script>
+</BaseLayout>

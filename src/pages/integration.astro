@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SnippetCard from '../components/SnippetCard.astro';
+import SearchableFilter from '../components/SearchableFilter.astro';
+import { getLibraryGroups } from '../utils/groups';
+import { getLanguageLabel } from '../utils/language';
+import { humanize } from '../utils/text';
+import { encodePathSegments } from '../utils/url.js';
+import '../styles/integration.css';
+
+const site = (Astro.site?.href ?? 'https://securitycards.rewarelabs.com/').replace(/\/$/, '');
+const groups = await getLibraryGroups();
+const libraryOptions = groups.map(group => {
+  const encodedSlug = encodePathSegments(group.slug);
+  const guidanceUrl = group.downloadHref
+    ? `${site}${group.downloadHref}`
+    : `${site}/downloads/${encodedSlug}/0_security_blueprint.md`;
+  const label = `${humanize(group.library)} ${group.version}`;
+  return {
+    value: guidanceUrl,
+    label,
+    searchText: `${getLanguageLabel(group.language)} ${label}`,
+  };
+});
+
+const globalInstall = 'npx skills add Reware-Labs/securitycards --skill securitycards -g';
+const localInstall = 'npx skills add Reware-Labs/securitycards --skill securitycards';
+const generalPrompt = `Use the Security Cards skill for this task. Check the project's manifests and lockfiles to identify the libraries and versions in use. Find the most relevant Security Cards, apply their secure rules, verify the finished work with appropriate tests or checks, and include links to the cards you used.`;
+const agentGuideUrl = `${site}/agent-usage.md`;
+const agentFetch = `curl ${agentGuideUrl}`;
+const clipboardIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+const endpoints = [
+  { label: 'Agent usage guide', value: '/agent-usage.md', note: 'Simple instructions an AI agent can follow.' },
+  { label: 'JSON catalog', value: '/catalog.json', note: 'A structured list of supported libraries, versions, and cards.' },
+  { label: 'Text catalog', value: '/llms.txt', note: 'The same catalog in a text-friendly format.' },
+  { label: 'Library bundle', value: '/downloads/{language}/{library}/{version}.md', note: 'All available cards for one library version.' },
+  { label: 'Individual card', value: '/downloads/{language}/{library}/{version}/{category}.md', note: 'Guidance for one focused security topic.' },
+];
+---
+
+<BaseLayout
+  title="Integration"
+  description="Install Security Cards as an AI skill or show any agent how to use secure coding guidance for your libraries."
+  analytics={{ pageType: 'integration' }}
+>
+  <div class="page-wrapper">
+    <section class="hero">
+      <span class="hero-eyebrow">Integration</span>
+      <h1 class="hero-title">Use Security Cards with your AI tools</h1>
+      <p class="hero-sub">
+        Install the skill, or share the <a class="int-guide-link" href="/agent-usage.md">agent usage guide</a> directly. Security Cards helps your AI use guidance that matches the libraries in your project.
+      </p>
+    </section>
+
+    <div class="persona-switch" data-persona-tabs hidden>
+      <span class="sr-only">Show instructions for</span>
+      <button class="persona-tab" type="button" data-persona="human" aria-selected="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>I'm a human</span>
+      </button>
+      <button class="persona-tab" type="button" data-persona="agent" aria-selected="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
+        <span>I'm an agent</span>
+      </button>
+    </div>
+
+    <section class="int-panel" data-persona-panel="human" id="persona-panel-human">
+      <div class="int-heading">
+        <span class="int-section-kicker">Recommended</span>
+        <h2 class="int-h2">Install the AI skill</h2>
+        <p class="int-p">The skill shows your coding agents how to find and use the right Security Cards for your project. The <a class="int-guide-link" href="/agent-usage.md">agent usage guide</a> explains the same workflow in a standalone file.</p>
+      </div>
+
+      <SnippetCard title="Global installation" description="Available across your projects" lang="bash" code={globalInstall} copyLabel="Copy global install command" />
+      <details class="int-secondary-install">
+        <summary>Install for only this project</summary>
+        <SnippetCard title="Project-local installation" lang="bash" code={localInstall} copyLabel="Copy project-local install command" />
+      </details>
+
+      <section class="int-prompt-section" aria-labelledby="prompt-title">
+        <div class="int-heading">
+          <span class="int-section-kicker">How to use it</span>
+          <h2 class="int-h2" id="prompt-title">Use the prompt with any coding agent</h2>
+          <p class="int-p">Let the agent check your project, or choose a library and version to make the prompt more specific.</p>
+        </div>
+
+        <div class="prompt-builder">
+          <label class="prompt-label" for="integration-library">Library guidance</label>
+          <SearchableFilter
+            id="integration-library"
+            toggleLabel="Choose library guidance"
+            searchLabel="Search supported libraries and versions"
+            searchPlaceholder="Search by library, language, or version…"
+            optionsLabel="Supported library versions"
+            allLabel="Let the agent inspect my project"
+            emptyLabel="No supported libraries found"
+            options={libraryOptions}
+            align="left"
+            wide
+          />
+
+          <div class="prompt-card">
+            <div class="prompt-card-head">
+              <span>Prompt</span>
+              <button
+                class="copy-btn prompt-copy"
+                type="button"
+                data-prompt-copy
+                data-content={generalPrompt}
+                data-default-label="Copy general Security Cards prompt"
+                aria-label="Copy general Security Cards prompt"
+                title="Copy prompt"
+              >
+                <span set:html={clipboardIcon}></span>
+                <span class="icon-btn-label">Copy prompt</span>
+              </button>
+            </div>
+            <pre class="prompt-content" data-prompt-output data-general-prompt={generalPrompt}>{generalPrompt}</pre>
+          </div>
+        </div>
+      </section>
+
+      <aside class="blueprint-note">
+        <strong>Prefer to browse first?</strong>
+        <p>A Security Blueprint is a distilled overview of a library’s secure-by-default posture. Use it to understand the essentials before opening category cards for focused implementation guidance.</p>
+        <a href="/">Browse supported libraries</a>
+      </aside>
+    </section>
+
+    <section class="int-panel" data-persona-panel="agent" id="persona-panel-agent">
+      <div class="int-heading">
+        <span class="int-section-kicker">For AI agents</span>
+        <h2 class="int-h2">Start with the skill or the agent guide</h2>
+        <p class="int-p">If the <code class="int-inline-code">securitycards</code> skill is installed, use it. Otherwise, open the <a class="int-guide-link" href="/agent-usage.md">agent usage guide</a> for everything needed to work with Security Cards.</p>
+      </div>
+
+      <div class="agent-guide-actions">
+        <a class="btn btn--primary" href="/agent-usage.md" type="text/markdown">Open agent-usage.md</a>
+        <button
+          class="btn btn--secondary copy-btn agent-url-copy"
+          type="button"
+          data-content={agentGuideUrl}
+          data-default-label="Copy agent usage guide URL"
+          aria-label="Copy agent usage guide URL"
+        >
+          <span set:html={clipboardIcon}></span>
+          <span class="icon-btn-label">Copy guide URL</span>
+        </button>
+      </div>
+
+      <section class="agent-use-cases" aria-labelledby="agent-use-cases-title">
+        <h3 id="agent-use-cases-title">Use Security Cards when you are</h3>
+        <div class="agent-use-case-grid">
+          <article>
+            <strong>Starting a new project</strong>
+            <p>Choose libraries from the catalog, or let the agent choose based on your context, then start with the matching security blueprints.</p>
+          </article>
+          <article>
+            <strong>Building a feature</strong>
+            <p>Find focused guidance for the libraries and security topics involved in the change.</p>
+          </article>
+          <article>
+            <strong>Reviewing a codebase</strong>
+            <p>Compare existing code with the relevant secure rules and explain any concrete issues found.</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="agent-invariant">
+        <h3>How to use the cards</h3>
+        <p>Check the versions used by the project, choose the most focused cards that fit the task, apply their secure rules, verify the result, and link to the cards used. If a project version is not supported, say so instead of using guidance for a different version.</p>
+        <p>The full list of supported libraries and cards is available in <a href="/catalog.json">catalog.json</a>.</p>
+      </div>
+
+      <details class="agent-fetch-example">
+        <summary>Fetch the guide from the command line</summary>
+        <SnippetCard title="agent-usage.md" lang="bash" code={agentFetch} copyLabel="Copy agent usage guide command" />
+      </details>
+    </section>
+
+    <details class="advanced-reference">
+      <summary>
+        <span>More ways to connect</span>
+        <small>Useful files and URL patterns</small>
+      </summary>
+      <ul class="int-pattern">
+        {endpoints.map(endpoint => (
+          <li class="int-endpoint">
+            <div class="int-endpoint-text">
+              <span class="int-pattern-label">{endpoint.label}</span>
+              <code class="int-code">{endpoint.value}</code>
+              <span class="int-endpoint-note">{endpoint.note}</span>
+            </div>
+            <button
+              class="icon-btn copy-btn int-copy"
+              type="button"
+              data-content={`${site}${endpoint.value}`}
+              data-default-label={`Copy ${endpoint.label}`}
+              aria-label={`Copy ${endpoint.label}`}
+              title="Copy endpoint"
+              set:html={clipboardIcon}
+            />
+          </li>
+        ))}
+      </ul>
+    </details>
+  </div>
+
+  <script src="../scripts/card-actions.ts"></script>
+  <script src="../scripts/persona-switch.ts"></script>
+  <script src="../scripts/integration-prompt.ts"></script>
+</BaseLayout>

@@ -1,0 +1,79 @@
+---
+import SearchableFilter from './SearchableFilter.astro';
+
+/**
+ * LibrarySearch — the home-page search + filter bar.
+ *
+ * A plain text input plus searchable category and language comboboxes.
+ * Both filters are keyboard and assistive-technology friendly.
+ * (see library-search.ts).
+ */
+interface Props {
+  categories: { slug: string; label: string }[];
+  languages:  { value: string; label: string }[];
+}
+const { categories, languages } = Astro.props;
+---
+
+<section class="library-discovery" aria-label="Browse libraries">
+<div class="library-search" role="search">
+  <div class="library-search-wrapper">
+    <svg class="library-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" />
+      <path stroke-linecap="round" d="M21 21l-4.35-4.35" />
+    </svg>
+    <input
+      id="library-search-input"
+      class="library-search-input"
+      type="search"
+      placeholder="Search libraries and security topics"
+      aria-label="Search libraries, categories, and keywords"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="library-filter-panel" id="library-filter-panel">
+    <SearchableFilter
+      id="category-filter"
+      toggleLabel="Filter by security category"
+      searchLabel="Search security categories"
+      searchPlaceholder="Search categories…"
+      optionsLabel="Security categories"
+      allLabel="All categories"
+      emptyLabel="No categories found"
+      options={categories.map(category => ({ value: category.slug, label: category.label }))}
+      wide
+    />
+    <SearchableFilter
+      id="language-filter"
+      toggleLabel="Filter by programming language"
+      searchLabel="Search programming languages"
+      searchPlaceholder="Search languages…"
+      optionsLabel="Programming languages"
+      allLabel="All languages"
+      emptyLabel="No languages found"
+      options={languages}
+      align="left"
+    />
+  </div>
+</div>
+
+<div class="discovery-status-row">
+  <!-- Library result count temporarily hidden; retain for easy restoration.
+  <p class="discovery-count" id="library-result-count" aria-live="polite"></p>
+  -->
+  <div class="active-filters" id="active-filters" aria-label="Active filters"></div>
+  <button class="clear-filters" id="clear-filters" type="button" hidden>Clear filters</button>
+  <div class="view-toggle" role="group" aria-label="Library view">
+    <button class="view-toggle-button" type="button" data-library-view="grid" aria-pressed="true" aria-label="Card view" title="Card view">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="2.5" width="6" height="6" rx="1"/><rect x="11.5" y="2.5" width="6" height="6" rx="1"/><rect x="2.5" y="11.5" width="6" height="6" rx="1"/><rect x="11.5" y="11.5" width="6" height="6" rx="1"/></svg>
+    </button>
+    <button class="view-toggle-button" type="button" data-library-view="list" aria-pressed="false" aria-label="List view" title="List view">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+    </button>
+  </div>
+</div>
+</section>
+
+<script src="../scripts/library-search.ts"></script>

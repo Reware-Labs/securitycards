@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/privacy.css';
+
+const lastUpdated = 'August 3, 2026';
+---
+
+<BaseLayout
+  title="Disclaimer"
+  description="Important limitations and responsible-use guidance for Security Cards."
+  analytics={{ pageType: 'disclaimer' }}
+>
+  <div class="page-wrapper legal">
+    <section class="hero">
+      <span class="hero-eyebrow">Legal</span>
+      <h1 class="hero-title">Disclaimer</h1>
+      <p class="hero-sub">
+        Security Cards provides practical, version-specific guidance to support secure software
+        development. It does not replace professional judgment, testing, or a security review of
+        your particular system.
+      </p>
+      <p class="legal-updated">Last updated: {lastUpdated}</p>
+    </section>
+
+    <aside class="legal-notice" aria-labelledby="responsible-use-title">
+      <h2 class="legal-notice-title" id="responsible-use-title">Use the cards as guidance</h2>
+      <p class="legal-p">
+        We review cards before publication, but review cannot guarantee that every card is complete,
+        error-free, or suitable for every project. Verify guidance against the referenced library
+        version, official documentation, your threat model, and your own tests before relying on it.
+      </p>
+    </aside>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Informational purpose</h2>
+      <p class="legal-p">
+        The cards and all related content are provided for general informational and educational
+        purposes. They are not legal, compliance, audit, or professional security advice, and using
+        them does not create a professional, advisory, or fiduciary relationship with RewareLabs.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">No guarantee of accuracy or completeness</h2>
+      <p class="legal-p">
+        Security practices, libraries, and their documentation change over time. Although we make
+        reasonable efforts to review and maintain the cards, the content may contain mistakes,
+        omissions, outdated information, or examples that do not apply to your environment. We do
+        not warrant that the content is accurate, complete, current, secure, or fit for a particular
+        purpose.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Use of artificial intelligence</h2>
+      <p class="legal-p">
+        We use generative artificial intelligence tools to assist with researching, drafting, and
+        refining Security Cards. This means that some card content is AI-generated or
+        AI-assisted. In the interest of transparency, including the principles reflected in the EU
+        AI Act, we disclose that use here.
+      </p>
+      <p class="legal-p">
+        We review cards before publication, but human review does not eliminate the possibility of
+        AI-related errors, omissions, bias, fabricated information, or outdated guidance. AI output
+        is not treated as an authoritative source. You should verify each card against the cited
+        sources, official library documentation, and the requirements of your own system.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Your responsibility</h2>
+      <p class="legal-p">
+        You are responsible for evaluating whether a card applies to your software and for the
+        design, implementation, testing, deployment, and operation of your systems. Always review
+        changes in context, use appropriate automated and manual security testing, and obtain
+        qualified professional advice where the risk or applicable law requires it.
+      </p>
+      <p class="legal-p">
+        A card does not guarantee that software is secure or free from vulnerabilities, and the
+        absence of a topic from a card should not be understood as evidence that no risk exists.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Third-party software and links</h2>
+      <p class="legal-p">
+        Security Cards discusses and links to third-party libraries, repositories, and
+        documentation. Those projects are controlled by their respective owners. RewareLabs does
+        not endorse or control their content, availability, security, licensing, or future changes.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Limitation of liability</h2>
+      <p class="legal-p">
+        To the fullest extent permitted by applicable law, Security Cards and its content are
+        provided “as is” and “as available,” without warranties of any kind, whether express or
+        implied. RewareLabs and its contributors will not be liable for any loss, damage, claim, or
+        expense arising from or related to your use of, inability to use, or reliance on the cards
+        or related content.
+      </p>
+      <p class="legal-p">
+        Nothing in this disclaimer excludes or limits liability that cannot lawfully be excluded or
+        limited.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Changes</h2>
+      <p class="legal-p">
+        We may revise the cards or this disclaimer as the project evolves. The date above identifies
+        the latest published version of this page.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

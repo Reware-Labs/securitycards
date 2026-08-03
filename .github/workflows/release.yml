@@ -1,0 +1,99 @@
+name: Release to Cloudflare Pages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify release tag
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.release.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: release
+        name: Verify annotated tag, version, and main ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$(git cat-file -t "${GITHUB_REF_NAME}")" != "tag" ]]; then
+            echo "Release tags must be annotated."
+            exit 1
+          fi
+
+          release_commit="$(git rev-list -n 1 "${GITHUB_REF_NAME}")"
+          expected_tag="v$(node -p "require('./package.json').version")"
+
+          if [[ "${GITHUB_REF_NAME}" != "${expected_tag}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${expected_tag}."
+            exit 1
+          fi
+
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "${release_commit}" origin/main; then
+            echo "Release commit ${release_commit} is not contained in origin/main."
+            exit 1
+          fi
+
+          echo "commit=${release_commit}" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run validate
+
+  deploy:
+    name: Deploy production
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build and validate production assets
+        env:
+          PUBLIC_ANALYTICS_ENABLED: ${{ vars.PUBLIC_ANALYTICS_ENABLED }}
+          PUBLIC_POSTHOG_KEY: ${{ vars.PUBLIC_POSTHOG_KEY }}
+          PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
+          PUBLIC_ANALYTICS_ENVIRONMENT: ${{ vars.PUBLIC_ANALYTICS_ENVIRONMENT }}
+        run: npm run validate
+
+      - name: Deploy tagged commit to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=rewarelabs-securitycards
+            --branch=main
+            --commit-hash=${{ needs.verify.outputs.commit }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

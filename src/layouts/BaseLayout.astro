@@ -1,0 +1,77 @@
+---
+// Self-hosted variable fonts (bundled by Vite, no external requests).
+// Imported before global.css so the @font-face rules land first.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import CommandPalette from '../components/CommandPalette.astro';
+import AnalyticsConsent from '../components/AnalyticsConsent.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalPath?: string | null;
+  noindex?: boolean;
+  analytics?: {
+    pageType?: string;
+    library?: string;
+    language?: string;
+    version?: string;
+  };
+}
+const {
+  title,
+  description = 'Security guidance for open-source libraries.',
+  canonicalPath,
+  noindex = false,
+  analytics = {},
+} = Astro.props;
+const canonicalURL = canonicalPath === null
+  ? null
+  : new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} | Reware Labs</title>
+  <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, follow" />}
+  {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+  <link rel="icon" href="/favicons/Icon__16-16-2.svg" type="image/svg+xml" sizes="16x16" />
+  <link rel="icon" href="/favicons/Icon__32-32-4.svg" type="image/svg+xml" sizes="32x32" />
+  <link rel="icon" href="/favicons/Icon__64-64-6.svg" type="image/svg+xml" sizes="64x64" />
+
+  <!-- Set the theme before first paint so there's no flash of the wrong colors -->
+  <script is:inline>
+    (function () {
+      var stored = localStorage.getItem('theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <slot name="head" />
+</head>
+<body
+  data-analytics-page-type={analytics.pageType}
+  data-analytics-library={analytics.library}
+  data-analytics-language={analytics.language}
+  data-analytics-version={analytics.version}
+>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <SiteHeader />
+
+  <main class="site-main" id="main-content" tabindex="-1">
+    <slot />
+  </main>
+
+  <SiteFooter />
+
+  <CommandPalette />
+  <AnalyticsConsent />
+</body>
+</html>

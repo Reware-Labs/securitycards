@@ -1,0 +1,208 @@
+---
+/**
+ * Home page — a grid of library tiles with client-side search.
+ *
+ * Cards are grouped by library/version (the first 3 segments of the card id:
+ * "language/library/versionSlug"). Each group becomes one LibraryCard that
+ * links to that library's master-detail page.
+ *
+ * The search bar (library-search.ts) filters the tiles by matching the query
+ * against each library's name, language, categories, and card titles — so a
+ * search hits keywords, categories, or libraries.
+ *
+ * Django analogy:
+ *   getCollection()  ≈ Card.objects.all()
+ *   grouping         ≈ queryset.values('language','library','version').annotate(Count('id'))
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LibraryCard from '../components/LibraryCard.astro';
+import LibrarySearch from '../components/LibrarySearch.astro';
+import { getLanguageLabel } from '../utils/language';
+import { humanize } from '../utils/text';
+import { access, readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { countMarkdownTokens } from '../utils/tokens';
+import { encodePathSegments } from '../utils/url.js';
+import '../styles/library.css';
+
+const dataDir = fileURLToPath(new URL('../../data', import.meta.url));
+
+const allCards = await getCollection('cards');
+
+// Group by "language/library/versionSlug" (first 3 id segments)
+interface Group {
+  language:   string;
+  library:    string;
+  version:    string;   // display version, e.g. "3.1.3"
+  slug:       string;   // "python/flask/3-1-3"
+  count:      number;   // single (non-blueprint) cards
+  tokenCount: number;   // downloadable bundle estimate, or sum of source files
+  hasDownload: boolean;
+  categories: Set<string>;
+  keywords:   Set<string>;   // lowercased search terms
+  downloadHref: string | null;   // null if no combined all-categories file exists
+}
+
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const groups = new Map<string, Group>();
+
+for (const card of allCards) {
+  const slug = card.id.split('/').slice(0, 3).join('/');
+  let group = groups.get(slug);
+  if (!group) {
+    const combinedPath = `${dataDir}/${slug}/1_all_categories.md`;
+    const hasDownload = await fileExists(combinedPath);
+    const tokenCount = hasDownload
+      ? countMarkdownTokens(await readFile(combinedPath, 'utf-8'))
+      : 0;
+    group = {
+      language:   card.data.language,
+      library:    card.data.library,
+      version:    card.data.version,
+      slug,
+      count:      0,
+      tokenCount,
+      hasDownload,
+      categories: new Set(),
+      keywords:   new Set([
+        card.data.library.toLowerCase(),
+        card.data.language,
+      ]),
+      downloadHref: hasDownload ? `/downloads/${encodePathSegments(slug)}.md` : null,
+    };
+    groups.set(slug, group);
+  }
+  if (!group.hasDownload) group.tokenCount += card.data.tokenCount;
+  if (card.data.cardType === 'single') {
+    group.count += card.data.cardCount;
+    group.categories.add(card.data.category);
+    group.keywords.add(card.data.category.toLowerCase());
+    group.keywords.add(humanize(card.data.category).toLowerCase());
+    group.keywords.add(card.data.title.toLowerCase());
+  }
+}
+
+// Sort: by language, then library
+const libraries = [...groups.values()].sort((a, b) => {
+  const byLang = a.language.localeCompare(b.language);
+  if (byLang !== 0) return byLang;
+  return a.library.localeCompare(b.library);
+});
+
+/* Hero stat strip — temporarily hidden; retain for easy restoration.
+const stats = {
+  languages: new Set(libraries.map(l => l.language)).size,
+  libraries: libraries.length,
+  cards:     libraries.reduce((sum, l) => sum + l.count, 0),
+};
+*/
+
+// Dropdown option lists.
+const languageOptions = [...new Set(libraries.map(l => l.language))]
+  .sort()
+  .map(value => ({ value, label: getLanguageLabel(value) }));
+const categoryOptions = [...new Set(allCards
+  .filter(c => c.data.cardType === 'single')
+  .map(c => c.data.category))]
+  .sort()
+  .map(slug => ({ slug, label: humanize(slug) }));
+---
+
+<BaseLayout
+  title="AI Code Security Cards"
+  description="AI code security guidelines and secure-coding rules for popular open-source libraries."
+  analytics={{ pageType: 'catalog' }}
+>
+
+  <div class="page-wrapper">
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="hero-eyebrow">Security guidance for using open source libraries</span>
+      <h1 class="hero-title">Know how to use libraries securely.</h1>
+      <p class="hero-sub">
+        AI Code Security Cards is an open source collection of library specific security guidance designed for developers and AI coding agents.
+      </p>
+
+      <!-- Stat strip (temporarily hidden; retain for easy restoration)
+      <dl class="hero-stats">
+        <div class="hero-stat">
+          <dd class="hero-stat-num">{stats.languages}</dd>
+          <dt class="hero-stat-label">Languages</dt>
+        </div>
+        <div class="hero-stat">
+          <dd class="hero-stat-num">{stats.libraries}</dd>
+          <dt class="hero-stat-label">Libraries</dt>
+        </div>
+        <div class="hero-stat">
+          <dd class="hero-stat-num">{stats.cards}</dd>
+          <dt class="hero-stat-label">Security cards</dt>
+        </div>
+      </dl>
+      -->
+    </section>
+
+    <!-- Search + filters -->
+    <LibrarySearch
+      categories={categoryOptions}
+      languages={languageOptions}
+    />
+
+    <!-- Library grid -->
+    <section class="library-results" aria-labelledby="library-results-title">
+      <h2 class="sr-only" id="library-results-title" tabindex="-1">Library results</h2>
+      <div class="card-grid" id="library-grid">
+      {libraries.map(lib => (
+        <LibraryCard
+          language={lib.language}
+          library={lib.library}
+          version={lib.version}
+          count={lib.count}
+          tokenCount={lib.tokenCount}
+          href={`/libraries/${encodePathSegments(lib.slug)}/`}
+          keywords={[...lib.keywords].join(' ')}
+          categories={[...lib.categories].join(' ')}
+          downloadHref={lib.downloadHref}
+          downloadFilename={`${lib.library}-${lib.version}-securitycards.md`}
+        />
+      ))}
+      </div>
+
+      <nav class="catalog-pagination" id="catalog-pagination" aria-label="Library results pages" hidden>
+        <button
+          class="catalog-pagination-button"
+          id="catalog-pagination-previous"
+          type="button"
+          aria-controls="library-grid"
+        >
+          <span aria-hidden="true">←</span> Previous
+        </button>
+        <span class="catalog-pagination-status" id="catalog-pagination-status" aria-live="polite"></span>
+        <button
+          class="catalog-pagination-button"
+          id="catalog-pagination-next"
+          type="button"
+          aria-controls="library-grid"
+        >
+          Next <span aria-hidden="true">→</span>
+        </button>
+      </nav>
+    </section>
+
+    <!-- No-results message (toggled by the search script) -->
+    <p class="no-results" id="no-results" hidden>
+      <strong>No matching libraries.</strong>
+      Try a broader keyword or clear one of the filters.
+    </p>
+
+  </div>
+</BaseLayout>
