@@ -55,7 +55,7 @@ jobs:
 
           echo "commit=${release_commit}" >> "${GITHUB_OUTPUT}"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -76,7 +76,7 @@ jobs:
         with:
           ref: ${{ needs.verify.outputs.commit }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
