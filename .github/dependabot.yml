@@ -3,6 +3,7 @@ updates:
   # Keep npm dependencies (Astro, tooling) current.
   - package-ecosystem: npm
     directory: /
+    target-branch: staging
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
@@ -16,5 +17,6 @@ updates:
   # Keep the GitHub Actions used in CI current.
   - package-ecosystem: github-actions
     directory: /
+    target-branch: staging
     schedule:
       interval: weekly
