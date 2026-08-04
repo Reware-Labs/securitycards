@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Cards"
+  short_description: "Apply version-pinned secure coding guidance"
+  default_prompt: "Use $securitycards to implement or review this project with version-specific secure coding guidance."

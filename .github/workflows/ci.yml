@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: lint · check · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Fails if package-lock.json is out of sync with package.json.
+      - name: Install dependencies
+        run: npm ci
+
+      # Enforce the card markdown conventions the content loader depends on.
+      - name: Lint card format
+        run: npm run lint:cards
+
+      # Enforce general markdown style on cards and docs.
+      - name: Lint markdown
+        run: npm run lint:md
+
+      # Astro type/content-collection check.
+      - name: Type check
+        run: npm run check
+
+      # Version normalization must remain deterministic for humans and agents.
+      - name: Test URL recovery
+        run: npm test
+
+      # Full static build must succeed.
+      - name: Build
+        run: npm run build
+
+      - name: Verify production artifacts
+        run: npm run verify:build
+
+      # The installable skill must be valid and its offline discovery snapshot current.
+      - name: Validate agent skill
+        run: npm run validate:skill

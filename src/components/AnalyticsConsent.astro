@@ -1,0 +1,101 @@
+<aside class="analytics-consent" id="analytics-consent" aria-labelledby="analytics-consent-title" data-analytics-block hidden>
+  <div class="analytics-consent-copy">
+    <h2 id="analytics-consent-title">Help us improve Security Cards</h2>
+    <p>
+      Choose whether we may use privacy-conscious analytics and separately sampled session replay.
+      Nothing optional is sent before you decide. <a href="/privacy">Learn more</a>
+    </p>
+  </div>
+  <div class="analytics-consent-options" id="analytics-consent-options" hidden>
+    <fieldset>
+      <legend>Privacy preferences</legend>
+      <label class="consent-option consent-option--locked">
+        <span><strong>Necessary</strong><small>Theme, layout and your consent choice.</small></span>
+        <input type="checkbox" checked disabled aria-label="Necessary storage is always active" />
+      </label>
+      <label class="consent-option">
+        <span><strong>Analytics</strong><small>Anonymous page journeys, interactions, device details and performance.</small></span>
+        <input type="checkbox" data-consent-analytics />
+      </label>
+      <label class="consent-option">
+        <span><strong>Session replay</strong><small>A masked recording for 25% of eligible sessions. Requires analytics.</small></span>
+        <input type="checkbox" data-consent-replay disabled />
+      </label>
+    </fieldset>
+    <button class="btn btn--primary consent-save" type="button" data-consent-save>Save choices</button>
+  </div>
+  <div class="analytics-consent-actions">
+    <button class="btn btn--secondary" type="button" data-consent-choice="reject">Reject all</button>
+    <button class="btn btn--secondary" type="button" data-consent-manage aria-expanded="false" aria-controls="analytics-consent-options">Manage options</button>
+    <button class="btn btn--primary" type="button" data-consent-choice="accept">Accept all</button>
+  </div>
+</aside>
+
+<script>
+  import { getConsentPreferences, isAnalyticsConfigured, setConsentPreferences } from '../scripts/analytics';
+  const banner = document.getElementById('analytics-consent');
+  const options = document.getElementById('analytics-consent-options');
+  const analyticsToggle = banner?.querySelector<HTMLInputElement>('[data-consent-analytics]');
+  const replayToggle = banner?.querySelector<HTMLInputElement>('[data-consent-replay]');
+  const manageButton = banner?.querySelector<HTMLButtonElement>('[data-consent-manage]');
+  const configured = isAnalyticsConfigured();
+  if (banner && configured && getConsentPreferences() === null) banner.hidden = false;
+  if (!configured) {
+    document.querySelectorAll<HTMLElement>('[data-consent-settings]').forEach((button) => { button.hidden = true; });
+  }
+
+  const syncReplayState = () => {
+    if (!analyticsToggle || !replayToggle) return;
+    replayToggle.disabled = !analyticsToggle.checked;
+    if (!analyticsToggle.checked) replayToggle.checked = false;
+  };
+
+  const closeBanner = () => {
+    if (banner) banner.hidden = true;
+    if (options) options.hidden = true;
+    manageButton?.setAttribute('aria-expanded', 'false');
+  };
+
+  const showOptions = () => {
+    if (!options || !analyticsToggle || !replayToggle) return;
+    const preferences = getConsentPreferences();
+    analyticsToggle.checked = preferences?.analytics ?? false;
+    replayToggle.checked = preferences?.replay ?? false;
+    syncReplayState();
+    options.hidden = false;
+    manageButton?.setAttribute('aria-expanded', 'true');
+    analyticsToggle.focus();
+  };
+
+  analyticsToggle?.addEventListener('change', syncReplayState);
+  manageButton?.addEventListener('click', () => {
+    if (options?.hidden) showOptions();
+    else {
+      if (options) options.hidden = true;
+      manageButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  banner?.querySelector<HTMLButtonElement>('[data-consent-save]')?.addEventListener('click', () => {
+    setConsentPreferences({ analytics: analyticsToggle?.checked ?? false, replay: replayToggle?.checked ?? false });
+    closeBanner();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const choice = button.dataset.consentChoice;
+      if (choice === 'accept') setConsentPreferences({ analytics: true, replay: true });
+      else if (choice === 'reject') setConsentPreferences({ analytics: false, replay: false });
+      else return;
+      closeBanner();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-consent-settings]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!banner || !configured) return;
+      banner.hidden = false;
+      showOptions();
+    });
+  });
+</script>

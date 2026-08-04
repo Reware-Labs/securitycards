@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/not-found.css';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="This Security Cards URL is not available. Recover using the complete machine-readable catalog."
+  canonicalPath={null}
+  noindex={true}
+  analytics={{ pageType: 'not-found' }}
+>
+  <link
+    slot="head"
+    rel="alternate"
+    type="text/markdown"
+    href="/agent-usage.md"
+    title="Security Cards agent usage guide"
+  />
+
+  <div class="page-wrapper not-found-wrapper">
+    <section class="not-found-hero" aria-labelledby="not-found-title">
+      <div class="not-found-status" aria-hidden="true">404</div>
+      <div class="not-found-copy">
+        <span class="hero-eyebrow">URL recovery</span>
+        <h1 id="not-found-title">This Security Cards URL isn’t available.</h1>
+        <p>
+          The library, category, or path may be incorrect. Unsupported versions
+          are normally redirected automatically when the language and library are known.
+        </p>
+        <p class="not-found-request">
+          <span>Requested path</span>
+          <code id="not-found-path">Unknown path</code>
+        </p>
+        <p
+          class="not-found-resolver-status"
+          id="not-found-resolver-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          Checking the catalog for a supported version…
+        </p>
+        <div class="not-found-actions">
+          <a class="btn btn--primary" href="/">Browse supported libraries</a>
+          <a class="btn btn--secondary" href="/llms.txt" type="text/plain">
+            Open complete catalog
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="not-found-agent" aria-labelledby="agent-recovery-title">
+      <div>
+        <span class="not-found-kicker">For humans and AI agents</span>
+        <h2 id="agent-recovery-title">Recover from the canonical catalog</h2>
+        <p>
+          The catalog lists every supported language, library, version, and canonical
+          Markdown URL. Use it as the source of truth instead of constructing paths.
+          New to the platform? <a href="/agent-usage.md">Read the agent usage guide</a>.
+        </p>
+      </div>
+      <a class="not-found-catalog-link" href="/llms.txt">
+        <span>Complete machine-readable catalog</span>
+        <code>GET /llms.txt</code>
+      </a>
+    </section>
+
+    <section class="not-found-patterns" aria-labelledby="url-patterns-title">
+      <div class="not-found-section-head">
+        <div>
+          <span class="not-found-kicker">Canonical URL shapes</span>
+          <h2 id="url-patterns-title">Request only supported paths</h2>
+        </div>
+        <a href="/integration">Read the integration guide</a>
+      </div>
+      <dl>
+        <div>
+          <dt>Library page</dt>
+          <dd><code>/libraries/{'{language}'}/{'{library}'}/{'{version}'}/</code></dd>
+        </div>
+        <div>
+          <dt>Library bundle</dt>
+          <dd><code>/downloads/{'{language}'}/{'{library}'}/{'{version}'}.md</code></dd>
+        </div>
+        <div>
+          <dt>Single security card</dt>
+          <dd><code>/downloads/{'{language}'}/{'{library}'}/{'{version}'}/{'{category}'}.md</code></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <script is:inline>
+    const path = document.getElementById('not-found-path');
+    if (path) {
+      path.textContent = window.location.pathname + window.location.search;
+    }
+  </script>
+  <script src="../scripts/not-found-resolver.js"></script>
+</BaseLayout>

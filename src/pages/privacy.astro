@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/privacy.css';
+
+// Static, plain-text so the "last updated" stays honest and easy to bump.
+const lastUpdated = 'July 13, 2026';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="How Security Cards handles local preferences and optional analytics."
+  analytics={{ pageType: 'privacy' }}
+>
+  <div class="page-wrapper legal">
+    <section class="hero">
+      <span class="hero-eyebrow">Legal</span>
+      <h1 class="hero-title">Privacy Policy</h1>
+      <p class="hero-sub">
+        Security Cards is a static website with no accounts or forms. Optional analytics only
+        starts after you actively consent.
+      </p>
+      <p class="legal-updated">Last updated: {lastUpdated}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Controller</h2>
+      <p class="legal-p">
+        The controller responsible for data processing on this website is:
+      </p>
+      <address class="legal-address">
+        <strong>RewareLabs — Security Cards</strong><br />
+        CISPA Helmholtz Center for Information Security<br />
+        Stuhlsatzenhaus 5<br />
+        66123 Saarbrücken<br />
+        Germany
+      </address>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">General information on data processing</h2>
+      <p class="legal-p">
+        We only process personal data to the extent necessary to provide a functional and secure
+        website. Security Cards serves security-guidance cards as static files and has no user
+        accounts or contact forms. With your consent, we process limited usage information through
+        PostHog to understand which resources are useful and where navigation can be improved.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Hosting and server log files</h2>
+      <p class="legal-p">
+        The site is served by a hosting provider that, like every web server, may automatically record
+        technical information each time a page is requested. This can include your IP address, the date
+        and time of access, the page or file requested, the referring URL, and details about your
+        browser and operating system.
+      </p>
+      <p class="legal-p">
+        This data is processed on the basis of our legitimate interest in operating a secure and stable
+        website (Art. 6(1)(f) GDPR). It is not combined with other data and is not used to identify you.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Data retention</h2>
+      <p class="legal-p">
+        Any server log data is stored only for as long as necessary to fulfil the purpose above, or as
+        required by law, and is then deleted or anonymized.
+      </p>
+      <p class="legal-p">
+        Our launch target for sampled session recordings is 30 days. The final retention period for
+        analytics events must be confirmed in the PostHog project and this policy before public launch.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Data security</h2>
+      <p class="legal-p">
+        The site is served exclusively over an encrypted HTTPS (SSL/TLS) connection to protect data in
+        transit. We take appropriate technical and organizational measures to protect against
+        unauthorized access, loss, or manipulation of data.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Cookies and local storage</h2>
+      <p class="legal-p">
+        To remember your interface preferences, Security Cards stores a few small values in your browser's{' '}
+        <code class="legal-code">localStorage</code>:
+      </p>
+      <ul class="legal-list">
+        <li><code class="legal-code">theme</code> — your light or dark mode choice.</li>
+        <li><code class="legal-code">library-view</code> — grid or list layout for the catalog.</li>
+        <li><code class="legal-code">integrationPersona</code> — the developer or agent view on the Integration page.</li>
+        <li><code class="legal-code">securitycards.analytics-consent</code> — your separate analytics and session-replay choices, plus the decision and expiry times.</li>
+      </ul>
+      <p class="legal-p">
+        These functional preferences stay on your device. If you accept analytics, PostHog also uses
+        first-party browser storage to distinguish anonymous visits and sessions. You can withdraw
+        either permission through <strong>Cookie settings</strong> in the footer or clear site data in your browser.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Optional analytics and session replay</h2>
+      <p class="legal-p">
+        We use an EU-hosted PostHog project only after consent (Art. 6(1)(a) GDPR). We measure normalized
+        page paths, active engagement, scroll-depth ranges, filters, searches without the search text,
+        library and card navigation, copies, downloads, integration choices, and outbound destination domains.
+        We also receive browser and browser version, operating system, device type, language and time zone,
+        screen and viewport size, referring domain, consent-safe campaign source/medium/name, and Core Web
+        Vitals. PostHog may derive coarse country, region, and city information from the connection IP address.
+        Every event is labeled as development or production data.
+      </p>
+      <p class="legal-p">
+        We do not identify visitors, create identified profiles, fingerprint devices, or use analytics for
+        advertising or cross-site tracking. Like any web request, an analytics request necessarily exposes the
+        connection IP address to the receiving service; we use it for coarse geolocation rather than as an
+        analytics identifier and do not intentionally add it to event properties. A random 25% of consented
+        sessions may be replayed only when you separately enable session replay. Inputs are
+        masked, and our implementation does not intentionally capture clipboard or downloaded contents,
+        query strings, raw user-agent strings, full referrer URLs, local-storage values, console logs, or network
+        request and response bodies.
+      </p>
+      <p class="legal-p">
+        You may reject analytics and session replay without losing any site functionality, and you may change or withdraw either choice at any
+        time with effect for the future. <strong>Before public launch, this section must be reviewed together
+        with the PostHog DPA, subprocessor list, final retention settings, and a privacy contact address.</strong>
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2 class="legal-h2">Your rights</h2>
+      <p class="legal-p">
+        Under the GDPR you have the right to:
+      </p>
+      <ul class="legal-list">
+        <li>access the data we store about you;</li>
+        <li>have inaccurate data corrected;</li>
+        <li>request deletion of your data;</li>
+        <li>restrict how your data is processed;</li>
+        <li>receive your data in a portable format;</li>
+        <li>object to certain types of processing; and</li>
+        <li>withdraw any consent you have given, with effect for the future.</li>
+      </ul>
+      <p class="legal-p">
+        To exercise any of these rights, please contact the controller at the address above. You also
+        have the right to lodge a complaint with a data protection supervisory authority.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

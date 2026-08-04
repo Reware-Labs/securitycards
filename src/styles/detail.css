@@ -1,0 +1,248 @@
+/* ── Card Detail Page ──────────────────────────────────────── */
+
+/* Card actions */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.icon-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+}
+.icon-btn:active { transform: scale(0.96); }
+.icon-btn.is-copied { color: var(--color-accent); border-color: transparent; background: none; }
+.icon-btn.is-error { color: #b42318; background: color-mix(in srgb, #b42318 9%, transparent); }
+.icon-btn-label { display: none; }
+@media (min-width: 768px) {
+  .icon-btn-label { display: inline; }
+  .icon-btn { padding: 0 0.75rem; }
+}
+
+/* ── Card title + actions row (inside .card-content) ──────── */
+.card-content-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.card-content-title {
+  font-size: clamp(1.25rem, 3vw, var(--font-size-2xl));
+  font-weight: 800;
+  line-height: 1.3;
+  margin-top: 0;
+}
+.card-token-estimate { margin-top: var(--space-1); margin-bottom: 0 !important; color: var(--color-text-muted) !important; font-family: var(--font-mono); font-size: 0.75rem; }
+
+/* ── Markdown content ──────────────────────────────────────── */
+.card-content {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: clamp(1.25rem, 3.5vw, 3rem);
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+  overflow: clip;
+}
+
+/* Typography inside rendered markdown */
+.card-content h1,
+.card-content h2,
+.card-content h3 {
+  color: var(--color-text);
+  line-height: 1.3;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+.card-content h1:first-child,
+.card-content h2:first-child,
+.card-content h3:first-child { margin-top: 0; }
+
+.card-content h1 { font-size: var(--font-size-2xl); font-weight: 800; }
+.card-content h2 { font-size: var(--font-size-xl); font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+.card-content h3 { font-size: clamp(1.25rem, 3vw, var(--font-size-2xl)); font-weight: 800; }
+
+/* Panel title sits inside .card-content but is not markdown body content — override the generic h2 rule */
+.card-content .card-content-title {
+  font-size: clamp(1.25rem, 3vw, var(--font-size-2xl));
+  font-weight: 800;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ── "On this card" table of contents ──────────────────────── */
+.card-toc {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-inner);
+  background: var(--color-code-bg);
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.card-toc-summary {
+  padding: var(--space-3) 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.card-toc-summary::-webkit-details-marker { display: none; }
+.card-toc-summary::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform var(--dur) var(--ease-out);
+}
+.card-toc[open] .card-toc-summary::before { transform: rotate(90deg); }
+.card-toc-list {
+  list-style: none;
+  padding: 0 0 var(--space-3) var(--space-4);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.card-toc-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
+}
+.card-toc-link:hover { color: var(--color-accent); background: var(--color-surface-hover); }
+
+/* ── Prev/next card navigation ─────────────────────────────── */
+.card-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+.card-nav-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-inner);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+.card-nav-btn:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  background: var(--color-surface-hover);
+}
+.card-nav-next { text-align: right; align-items: flex-end; }
+.card-nav-dir { font-size: 0.75rem; color: var(--color-accent); font-weight: 600; }
+.card-nav-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.card-content p  { margin-bottom: var(--space-4); color: var(--color-text); max-width: 74ch; }
+.card-content ul,
+.card-content ol { padding-left: var(--space-6); margin-bottom: var(--space-4); }
+.card-content li { margin-bottom: var(--space-2); }
+
+.card-content strong { font-weight: 700; }
+
+.card-content a { color: var(--color-link); }
+.card-content a:hover { text-decoration: underline; }
+
+.card-content code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--color-badge-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+}
+
+/* Shiki-highlighted code blocks. `defaultColor: false` (see utils/shiki.ts)
+   emits both themes as CSS variables per token — we select light by default
+   and swap to the dark variables under [data-theme="dark"], so blocks
+   re-theme with the rest of the site without re-rendering. */
+.card-content .astro-code {
+  background: var(--color-code-bg) !important;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-inner);
+  padding: var(--space-4) var(--space-6);
+  overflow-x: auto;
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+  margin-bottom: var(--space-6);
+}
+.card-content .astro-code code {
+  background: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+}
+.card-content .astro-code,
+.card-content .astro-code span {
+  color: var(--shiki-light);
+}
+:root[data-theme="dark"] .card-content .astro-code,
+:root[data-theme="dark"] .card-content .astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* Section label style (e.g. **Use when**, **Secure rules**) */
+.card-content p strong:only-child {
+  display: block;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .card-content { padding: var(--space-5) var(--space-4); }
+  .card-content-header { align-items: center; }
+  .icon-btn { min-width: 2.75rem; min-height: 2.75rem; }
+  .card-nav { grid-template-columns: 1fr; }
+  .card-nav-next { text-align: left; align-items: flex-start; }
+}

@@ -1,0 +1,47 @@
+{
+  "globs": ["data/**/*.md", "README.md"],
+  "ignores": [
+    "node_modules",
+    "dist",
+    ".astro",
+    "data/**/0_security_blueprint.md",
+    "data/**/1_all_categories.md"
+  ],
+  "config": {
+    "default": true,
+
+    // Card prose intentionally uses long lines; wrapping would hurt diffs.
+    "MD013": false,
+
+    // Cards use bold labels ("**Use when**", "**Rule 1: ...**") as section
+    // markers rather than headings — the house style the loader parses.
+    "MD036": false,
+
+    // The aggregate 1_all_categories.md concatenates several files, each with
+    // its own top-level "# Security cards" heading.
+    "MD025": false,
+
+    // Category slugs and card titles legitimately repeat within a file and
+    // across the concatenated aggregate.
+    "MD024": false,
+
+    // The generator emits double blank lines between sections throughout.
+    "MD012": false,
+
+    // Blueprints number their rules 1., 2., 3. with explanatory paragraphs
+    // between items, which markdownlint reads as separate single-item lists.
+    "MD029": false,
+
+    // Hard tabs are only present inside Go code samples, where tabs are the
+    // language convention.
+    "MD010": { "code_blocks": false },
+
+    // Fires on Python dunder identifiers in prose (e.g. __allow_unmapped__),
+    // not real strong-emphasis style drift.
+    "MD050": false,
+
+    // Fires on Rails glob-style method references (e.g. *_url, *_path), not
+    // real spaced-emphasis.
+    "MD037": false,
+  },
+}
