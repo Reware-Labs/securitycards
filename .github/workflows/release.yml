@@ -29,12 +29,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ "$(git cat-file -t "${GITHUB_REF_NAME}")" != "tag" ]]; then
+          tag_ref="refs/tags/${GITHUB_REF_NAME}"
+
+          git fetch --force --no-tags origin \
+            "+${tag_ref}:${tag_ref}"
+
+          if [[ "$(git cat-file -t "${tag_ref}")" != "tag" ]]; then
             echo "Release tags must be annotated."
             exit 1
           fi
 
-          release_commit="$(git rev-list -n 1 "${GITHUB_REF_NAME}")"
+          release_commit="$(git rev-parse "${tag_ref}^{}")"
           expected_tag="v$(node -p "require('./package.json').version")"
 
           if [[ "${GITHUB_REF_NAME}" != "${expected_tag}" ]]; then
