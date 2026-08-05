@@ -1,6 +1,6 @@
 ---
 name: securitycards
-description: Use version-specific Security Cards guidance when starting a software project, building a security-sensitive feature, or reviewing code that uses supported open source libraries. Use it for secure defaults, authentication, authorization, input handling, injection, cryptography, file handling, network boundaries, secrets, sessions, and other security concerns that need library-specific rules.
+description: Apply version-specific secure coding guidance to AI-generated or human-written code that uses supported open source libraries. Use when starting a software project, implementing a security-sensitive feature, or reviewing code for secure defaults, authentication, authorization, input handling, injection, cryptography, file handling, network boundaries, secrets, sessions, and other library-specific security concerns.
 ---
 
 # Security Cards

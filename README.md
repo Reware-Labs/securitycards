@@ -1,5 +1,7 @@
 # Security Cards
 
+[![Install Security Cards](https://skills.sh/b/Reware-Labs/securitycards)](https://skills.sh/Reware-Labs/securitycards)
+
 Security Cards is an open source collection of library-specific security guidance for developers and AI coding agents. The cards are tied to specific library versions, so developers and agents can use guidance that matches the code they are working on.
 
 Each card says when it applies, then gives secure rules and code examples. You can browse the cards by language, library, version, and security category.
@@ -12,6 +14,8 @@ The cards are available at [securitycards.rewarelabs.com](https://securitycards.
 ## Use Security Cards as a skill
 
 The `securitycards` skill lets a coding agent look up and apply cards while it works. Install it with either `npx` or the GitHub CLI.
+
+The skill is instruction-only: it contains no executable scripts and requires no API keys. It fetches guidance from the public Security Cards catalog and cites the cards it applies.
 
 With `npx`:
 
