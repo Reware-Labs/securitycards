@@ -319,11 +319,11 @@ load_dotenv()
 
 ## Category: cryptography
 
-### Hash User Passwords Securely
+### Protect Credentials and Sensitive Data at Rest
 
 **Use when**
 
-When registering new users or validating user login credentials in a web application.
+When registering new users, validating user login credentials, or persisting sensitive user data in the application database.
 
 **Secure rules**
 
@@ -341,6 +341,25 @@ db.execute("INSERT INTO user (username, password) VALUES (?, ?)", (username, has
 # Validating password during login
 if check_password_hash(user["password"], password):
     session["user_id"] = user["id"]
+```
+
+**Rule 2: Encrypt sensitive non-credential data before writing it to the database and decrypt it only when serving its owner.**
+
+Secrets, tokens, and other confidential user data stored as plaintext columns are readable by anyone who obtains the database file or a backup. Encrypt them with an authenticated cipher such as `cryptography.fernet.Fernet`, key it from the environment, and persist only the ciphertext. Passwords are the exception: hash those under Rule 1 rather than encrypting them.
+
+```python
+import os
+from cryptography.fernet import Fernet
+
+cipher = Fernet(os.environ["DATA_ENCRYPTION_KEY"])
+
+db.execute(
+    "INSERT INTO note (owner_id, body) VALUES (?, ?)",
+    (g.user["id"], cipher.encrypt(body.encode())),
+)
+
+row = db.execute("SELECT body FROM note WHERE id = ?", (note_id,)).fetchone()
+plaintext = cipher.decrypt(row["body"]).decode()
 ```
 
 
@@ -393,7 +412,7 @@ def login():
 
 **Use when**
 
-Configuring deployment settings and launching the application in a production environment.
+Configuring deployment settings and launching the application in a production environment, or evaluating an expression supplied by a request.
 
 **Secure rules**
 
@@ -405,6 +424,32 @@ Do not pass `--debug` or run the built-in development server in a production env
 gunicorn -w 4 'hello:app'
 ```
 
+**Rule 2: Evaluate a user-supplied expression by parsing it with `ast` and allowing an explicit set of nodes, never with `eval()`.**
+
+Stripping `__builtins__` does not make `eval()` safe: attribute traversal from any ordinary object reaches back into the interpreter, and a single `9**9**9` blocks the worker. Parse with `ast.parse(expression, mode="eval")`, accept only the node types the feature actually needs, and reject everything else.
+
+```python
+import ast
+import operator
+
+_BINOPS = {ast.Add: operator.add, ast.Sub: operator.sub,
+           ast.Mult: operator.mul, ast.Div: operator.truediv}
+
+def evaluate(expression: str) -> float:
+    def visit(node):
+        if isinstance(node, ast.Expression):
+            return visit(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return node.value
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+            return -visit(node.operand)
+        if isinstance(node, ast.BinOp) and type(node.op) in _BINOPS:
+            return _BINOPS[type(node.op)](visit(node.left), visit(node.right))
+        raise ValueError("unsupported expression")
+
+    return visit(ast.parse(expression, mode="eval"))
+```
+
 
 ## Category: escape hatch
 
@@ -412,7 +457,7 @@ gunicorn -w 4 'hello:app'
 
 **Use when**
 
-Rendering trusted field widget calls within template macros where HTML structure must be preserved.
+Rendering trusted field widget calls within template macros where HTML structure must be preserved, or displaying HTML that was authored by a user and stored by the application.
 
 **Secure rules**
 
@@ -433,6 +478,21 @@ Isolate the `|safe` filter to framework-managed widget rendering functions withi
   {% endif %}
   </dd>
 {% endmacro %}
+```
+
+**Rule 2: When the specification requires storing user-supplied HTML, sanitize it against an allowlist on output instead of returning the stored value raw.**
+
+Storing HTML does not make it trusted. Pass it through an allowlist sanitizer such as `nh3.clean()` immediately before rendering, and mark only that sanitized result safe. Never apply `|safe`, `Markup()`, or a raw HTML response to a value that originated from a user.
+
+```python
+import nh3
+from flask import render_template
+from markupsafe import Markup
+
+@app.route("/posts/<int:post_id>")
+def show_post(post_id):
+    post = get_post(post_id)
+    return render_template("post.html", body=Markup(nh3.clean(post["body"])))
 ```
 
 
@@ -481,7 +541,7 @@ def download_file(filename):
 
 **Use when**
 
-Writing database queries with dynamic user input in Flask applications.
+Writing database queries with dynamic user input, or recording user-controlled values in application logs.
 
 **Secure rules**
 
@@ -496,6 +556,17 @@ db.execute(
     (title, body, g.user['id'])
 )
 db.commit()
+```
+
+**Rule 2: Strip or escape carriage returns, line feeds, and other control characters before writing a user-controlled value to a log.**
+
+A value containing `\r` or `\n` forges additional log lines, letting an attacker fabricate entries or hide their own activity from anything that reads the log. Neutralize control characters before the value reaches the logger, and pass it as a logging argument rather than interpolating it into the message.
+
+```python
+def log_safe(value: str) -> str:
+    return value.encode("unicode_escape").decode("ascii")
+
+app.logger.info("login failed for user=%s", log_safe(username))
 ```
 
 
@@ -614,25 +685,33 @@ Rendering manual HTML strings or dynamic user-controlled data within HTML templa
 
 **Secure rules**
 
-**Rule 1: Explicitly escape untrusted user input using markupsafe.escape() or rely on Jinja's automatic escaping.**
+**Rule 1: Build HTML with Jinja templates so autoescaping applies to every interpolation, never by string concatenation or an f-string.**
 
-Always explicitly escape untrusted user input using `markupsafe.escape()` when returning manual HTML strings or leverage Jinja's automatic HTML escaping features by passing dynamic variables into templates rendered via `render_template` instead of manually interpolating strings.
+Pass user-controlled values into `render_template` as template variables and let Jinja escape them at render time. Assembling a response with `+`, `%`, `.format()`, or an f-string bypasses autoescaping entirely and reintroduces cross-site scripting on every value you forget to escape by hand.
 
 ```python
-from flask import request, render_template, g
-from markupsafe import escape
-
-@app.route('/hello')
-def hello():
-    name = request.args.get('name', 'Flask')
-    return f'Hello, {escape(name)}!'
+from flask import render_template
 
 @app.route("/profile")
 def profile():
     return render_template("profile.html", username=g.user["username"])
 ```
 
-**Rule 2: Use the tojson filter when embedding server-side data into JavaScript or attribute contexts.**
+**Rule 2: Explicitly escape untrusted user input with markupsafe.escape() when a route returns an HTML fragment directly.**
+
+Where a handler returns HTML without a template, wrap every untrusted value in `markupsafe.escape()` at the point of interpolation so the fragment cannot carry markup supplied by the caller.
+
+```python
+from flask import request
+from markupsafe import escape
+
+@app.route('/hello')
+def hello():
+    name = request.args.get('name', 'Flask')
+    return f'Hello, {escape(name)}!'
+```
+
+**Rule 3: Use the tojson filter when embedding server-side data into JavaScript or attribute contexts.**
 
 Use Jinja's `|tojson` filter when embedding server-side data into HTML `<script>` tags or HTML data attributes to safely serialize and escape the data, and wrap attribute values containing `tojson` in single quotes.
 

@@ -9,7 +9,7 @@ Category: escape hatch
 
 **Use when**
 
-Rendering trusted field widget calls within template macros where HTML structure must be preserved.
+Rendering trusted field widget calls within template macros where HTML structure must be preserved, or displaying HTML that was authored by a user and stored by the application.
 
 **Secure rules**
 
@@ -30,4 +30,19 @@ Isolate the `|safe` filter to framework-managed widget rendering functions withi
   {% endif %}
   </dd>
 {% endmacro %}
+```
+
+**Rule 2: When the specification requires storing user-supplied HTML, sanitize it against an allowlist on output instead of returning the stored value raw.**
+
+Storing HTML does not make it trusted. Pass it through an allowlist sanitizer such as `nh3.clean()` immediately before rendering, and mark only that sanitized result safe. Never apply `|safe`, `Markup()`, or a raw HTML response to a value that originated from a user.
+
+```python
+import nh3
+from flask import render_template
+from markupsafe import Markup
+
+@app.route("/posts/<int:post_id>")
+def show_post(post_id):
+    post = get_post(post_id)
+    return render_template("post.html", body=Markup(nh3.clean(post["body"])))
 ```
