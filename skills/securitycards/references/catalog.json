@@ -307,6 +307,401 @@
               ]
             }
           ]
+        },
+        {
+          "slug": "protobuf",
+          "name": "Protobuf",
+          "latestVersion": "v35-1",
+          "versions": [
+            {
+              "version": "v35.1",
+              "versionSlug": "v35-1",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/cpp/protobuf/v35-1/",
+              "path": "/libraries/cpp/protobuf/v35-1/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1.md",
+              "bundlePath": "/downloads/cpp/protobuf/v35-1.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/0_security_blueprint.md",
+              "blueprintPath": "/downloads/cpp/protobuf/v35-1/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Constructing message components, managing byte buffers, and populating repeated or map fields.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/api-contract-misuse.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Parsing or converting messages containing `google.protobuf.Any` types using text format functions in Python.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/boundary-control.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring protocol buffer code generators in automated or multi-tenant build environments that read options from environment variables.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/configuration-source-integrity.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Serializing Protobuf messages and computing integrity verification, checksums, or signatures over the payload.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/cryptography.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/cryptography.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "Deserializing Protocol Buffer messages containing `google.protobuf.Any` fields or custom extension fields from untrusted inputs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/deserialization.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/deserialization.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "When configuring `CommandLineInterface` or `DiskSourceTree` to compile protocol buffer files and manage output or import paths.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/file-handling.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/file-handling.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Parsing text format strings or constructing protocol buffer messages from external input where required fields and valid contracts must be enforced.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/input-contract-definition.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Parsing, validating, and managing protocol buffer messages containing unknown fields across different language runtimes and parsers.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/input-interpretation-safety.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "memory-safety",
+                  "title": "Memory Safety",
+                  "description": "Developing multi-threaded Protobuf applications that utilize custom arena block allocators or coordinate arena destruction and resets across multiple threads.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/memory-safety.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/memory-safety.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Rendering serialized Protocol Buffer text format output or handling external display contexts.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/output-encoding.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Parsing, deserializing, or processing untrusted binary, JSON, text format, or descriptor payloads across various Protocol Buffers language runtimes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/resource-exhaustion.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Logging, printing, or stringifying protobuf messages that contain sensitive credentials, tokens, or personal data.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/secret-handling.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Compiling protocol buffer definitions and launching applications that consume generated message code to ensure that obsolete legacy gencode fails securely on startup.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/cpp/protobuf/v35-1/security-control-integrity.md",
+                  "path": "/downloads/cpp/protobuf/v35-1/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "dart",
+      "label": "Dart",
+      "catalogUrl": "https://securitycards.rewarelabs.com/llms/dart.txt",
+      "bundleUrl": "https://securitycards.rewarelabs.com/downloads/dart.md",
+      "libraries": [
+        {
+          "slug": "flutter",
+          "name": "Flutter",
+          "latestVersion": "3-44-8",
+          "versions": [
+            {
+              "version": "3.44.8",
+              "versionSlug": "3-44-8",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/dart/flutter/3-44-8/",
+              "path": "/libraries/dart/flutter/3-44-8/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8.md",
+              "bundlePath": "/downloads/dart/flutter/3-44-8.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/0_security_blueprint.md",
+              "blueprintPath": "/downloads/dart/flutter/3-44-8/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When building forms in Flutter and processing user inputs prior to saving or submission.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/api-contract-misuse.md",
+                  "path": "/downloads/dart/flutter/3-44-8/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Performing mDNS VM Service discovery on local networks where multiple active processes or services are present.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/boundary-control.md",
+                  "path": "/downloads/dart/flutter/3-44-8/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring custom repository mirrors, SDK download locations, or storage endpoints for Flutter and Dart packages.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/configuration-source-integrity.md",
+                  "path": "/downloads/dart/flutter/3-44-8/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "Configuring or testing rendering validation error handlers and error suppression mechanisms in low-level graphics subsystems.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/escape-hatch.md",
+                  "path": "/downloads/dart/flutter/3-44-8/escape-hatch.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "When creating temporary or sensitive files on disk to prevent overwriting pre-existing files or following malicious symlinks.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/file-handling.md",
+                  "path": "/downloads/dart/flutter/3-44-8/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Developing or building Flutter applications, handling custom web-define configurations, rendering templates, or utilizing dynamic expression evaluation and compilation APIs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/injection.md",
+                  "path": "/downloads/dart/flutter/3-44-8/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Configuring Android build settings and supplying build numbers in Flutter tooling.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/input-contract-definition.md",
+                  "path": "/downloads/dart/flutter/3-44-8/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-driven-boundary-selection",
+                  "title": "Input Driven Boundary Selection",
+                  "description": "Routing and rewriting web requests to upstream backend servers using proxy rules.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/input-driven-boundary-selection.md",
+                  "path": "/downloads/dart/flutter/3-44-8/input-driven-boundary-selection.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When parsing untrusted representations, configuration files, localization messages, or command-line option inputs in Flutter applications and tooling.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/input-interpretation-safety.md",
+                  "path": "/downloads/dart/flutter/3-44-8/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Registering native Ffi native resolvers and managing binary native payloads between Dart isolates and host platforms.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/interface-protocol-hardening.md",
+                  "path": "/downloads/dart/flutter/3-44-8/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "memory-safety",
+                  "title": "Memory Safety",
+                  "description": "Compiling and testing unoptimized Flutter Engine debug builds to catch native memory safety flaws such as buffer overflows and use-after-free.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/memory-safety.md",
+                  "path": "/downloads/dart/flutter/3-44-8/memory-safety.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "When configuring HTTP proxy environment variables for Flutter CLI workflows and development tools to ensure local loopback traffic bypasses the external proxy.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/network-boundary.md",
+                  "path": "/downloads/dart/flutter/3-44-8/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Decoding large or user-supplied image assets into memory where unbounded bitmap allocations can cause out-of-memory crashes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/resource-exhaustion.md",
+                  "path": "/downloads/dart/flutter/3-44-8/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "When building logging mechanisms, handling subprocess execution outputs, or generating system diagnostic reports that might contain sensitive credentials or PII.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/dart/flutter/3-44-8/secret-handling.md",
+                  "path": "/downloads/dart/flutter/3-44-8/secret-handling.md"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "elixir",
+      "label": "Elixir",
+      "catalogUrl": "https://securitycards.rewarelabs.com/llms/elixir.txt",
+      "bundleUrl": "https://securitycards.rewarelabs.com/downloads/elixir.md",
+      "libraries": [
+        {
+          "slug": "phoenix",
+          "name": "Phoenix",
+          "latestVersion": "v1-8-9",
+          "versions": [
+            {
+              "version": "v1.8.9",
+              "versionSlug": "v1-8-9",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/elixir/phoenix/v1-8-9/",
+              "path": "/libraries/elixir/phoenix/v1-8-9/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9.md",
+              "bundlePath": "/downloads/elixir/phoenix/v1-8-9.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/0_security_blueprint.md",
+              "blueprintPath": "/downloads/elixir/phoenix/v1-8-9/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Developing data layer context functions, controllers, or channel callbacks where database queries and resource actions must be restricted to the authenticated user or tenant.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/access-control.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When testing Phoenix controllers to ensure domain-level exceptions and resource lookup failures map correctly to expected HTTP status codes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/api-contract-misuse.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Implementing user authentication, token-based verification, magic links, API bearer token validation, and secure socket connection options in Phoenix.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/authentication.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Handling user-supplied return paths or redirect targets in Phoenix controllers to prevent open redirect vulnerabilities.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/boundary-control.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/boundary-control.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "When generating authentication features or configuring password hashing for user credentials.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/cryptography.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/cryptography.md"
+                },
+                {
+                  "slug": "csrf",
+                  "title": "CSRF",
+                  "description": "Configuring browser pipelines, session handling, and root layouts in Phoenix applications to prevent cross-site request forgery.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/csrf.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/csrf.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Handling dynamic input that should be evaluated as code or passed to system execution functions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/dangerous-execution.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/dangerous-execution.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "Deserializing binary data from untrusted sources in Phoenix or Plug applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/deserialization.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/deserialization.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "When handling user file uploads using `Plug.Upload` and persisting or serving files.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/file-handling.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building dynamic queries and database fragments in applications using Ecto or raw SQL queries",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/injection.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When handling external user input maps, form submissions, or API parameters in Ecto changesets before application processing and database operations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/input-contract-definition.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Handling incoming request parameters in Phoenix controllers where distinct sources such as query parameters, path variables, and request bodies must be unambiguously separated.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/input-interpretation-safety.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Configuring router pipelines and endpoint transport settings to enforce browser security headers and strict transport security.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/interface-protocol-hardening.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring local development endpoint server listeners and network interface bindings in Phoenix applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/network-boundary.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/network-boundary.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Rendering dynamic HTML responses and user input in Phoenix views and templates.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/output-encoding.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Configuring Phoenix sockets, transports, and endpoint parsers to handle incoming client connections and payloads safely.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/resource-exhaustion.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring runtime environments, endpoints, and database connections for production deployments.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/runtime-environment-hardening.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "When processing or logging request parameters, custom data maps, or schema fields containing sensitive credentials and tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/secret-handling.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/secret-handling.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Implementing user logout flows in Phoenix web applications to ensure session state is completely invalidated and active WebSocket connections are terminated.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/elixir/phoenix/v1-8-9/session-management.md",
+                  "path": "/downloads/elixir/phoenix/v1-8-9/session-management.md"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1661,6 +2056,762 @@
       "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java.md",
       "libraries": [
         {
+          "slug": "caffeine",
+          "name": "Caffeine",
+          "latestVersion": "v3-2-4",
+          "versions": [
+            {
+              "version": "v3.2.4",
+              "versionSlug": "v3-2-4",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/caffeine/v3-2-4/",
+              "path": "/libraries/java/caffeine/v3-2-4/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4.md",
+              "bundlePath": "/downloads/java/caffeine/v3-2-4.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/caffeine/v3-2-4/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Use when constructing caches, configuring custom weighers, and interacting with cache methods or map views to ensure required arguments, non-null values, and valid signatures are correctly provided.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/api-contract-misuse.md",
+                  "path": "/downloads/java/caffeine/v3-2-4/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Sharing JCache instances across application security boundaries where mutable objects are stored and accessed.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/boundary-control.md",
+                  "path": "/downloads/java/caffeine/v3-2-4/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "When loading external configuration resources for Caffeine JCache using `CacheManager.getURI()` and `TypesafeConfigurator`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/configuration-source-integrity.md",
+                  "path": "/downloads/java/caffeine/v3-2-4/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Configuring JCache integrations that dynamically instantiate classes from configuration settings using TypesafeConfigurator.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/dangerous-execution.md",
+                  "path": "/downloads/java/caffeine/v3-2-4/dangerous-execution.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "When building caches or handling asynchronous computations in Caffeine to prevent unbounded heap memory consumption and thread starvation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/caffeine/v3-2-4/resource-exhaustion.md",
+                  "path": "/downloads/java/caffeine/v3-2-4/resource-exhaustion.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "gson",
+          "name": "Gson",
+          "latestVersion": "gson-parent-2-14-0",
+          "versions": [
+            {
+              "version": "gson.parent.2.14.0",
+              "versionSlug": "gson-parent-2-14-0",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/gson/gson-parent-2-14-0/",
+              "path": "/libraries/java/gson/gson-parent-2-14-0/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0.md",
+              "bundlePath": "/downloads/java/gson/gson-parent-2-14-0.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/gson/gson-parent-2-14-0/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When controlling data exposure and preventing unauthorized field population during object-to-JSON and JSON-to-object conversions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/access-control.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When implementing custom `JsonDeserializer` or configuring type adapters and deserialization contexts to prevent infinite recursion, stack overflows, and runtime type errors.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/api-contract-misuse.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Use when serializing or deserializing Java records or inaccessible types where data crosses untrusted application boundaries and runtime reflection must be strictly controlled.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/boundary-control.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/boundary-control.md"
+                },
+                {
+                  "slug": "csrf",
+                  "title": "CSRF",
+                  "description": "serializing sensitive data served to web clients via JSON endpoints to prevent script-sourcing data theft.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/csrf.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/csrf.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "When configuring GsonBuilder and designing classes for deserialization to prevent unsafe object instantiation, bypass of constructors, and invalid state processing.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/deserialization.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/deserialization.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "When defining custom type adapters using `jsonAdapter` annotations or registering type adapter instances that require instantiation without relying on low-level JVM unsafe mechanisms.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/escape-hatch.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/escape-hatch.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When defining Java classes that will be populated via JSON deserialization and you need to enforce strict field contracts and allowed input keys.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/input-contract-definition.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Parsing untrusted JSON input streams or strings where strict RFC-compliant interpretation and duplicate key rejection are required to prevent parser differentials and input validation bypasses.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/input-interpretation-safety.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Serializing objects or writing JSON output that may be embedded directly into web responses, HTML documents, or script contexts.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/output-encoding.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Parsing untrusted JSON input streams using JsonReader to prevent stack overflow from deep nesting.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/resource-exhaustion.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Serializing or deserializing objects that contain sensitive fields such as passwords, secrets, or internal tokens to prevent unauthorized exposure.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/secret-handling.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Configuring global type adapters and domain model classes while relying on consistent serialization and deserialization controls.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/gson/gson-parent-2-14-0/security-control-integrity.md",
+                  "path": "/downloads/java/gson/gson-parent-2-14-0/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "hibernate-orm",
+          "name": "Hibernate Orm",
+          "latestVersion": "7-4-5",
+          "versions": [
+            {
+              "version": "7.4.5",
+              "versionSlug": "7-4-5",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/hibernate-orm/7-4-5/",
+              "path": "/libraries/java/hibernate-orm/7-4-5/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5.md",
+              "bundlePath": "/downloads/java/hibernate-orm/7-4-5.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/hibernate-orm/7-4-5/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Enabling multi-tenancy in Hibernate session factories and configuring tenant identification for data isolation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/access-control.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When executing HQL queries with pessimistic locking to protect against concurrent modifications and race conditions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/api-contract-misuse.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "When initializing, injecting, or managing `EntityManager` or `Session` instances across multi-threaded application environments.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/boundary-control.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring event listeners or initializing the SessionFactory in Hibernate.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/configuration-source-integrity.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "Mapping basic attributes whose Java types implement `java.io.Serializable` inside Hibernate domain entities.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/deserialization.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/deserialization.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "When registering custom StatementInspector instances to inspect or modify SQL statements before execution.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/escape-hatch.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/escape-hatch.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building HQL, JPQL, or native SQL queries that incorporate dynamic values or collection inputs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/injection.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When defining entity models and persistence lifecycle operations to ensure input data matches required constraints, allowed types, and length limits.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/input-contract-definition.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/input-contract-definition.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Configuring database connectivity, connection pools, and lifecycle management for production deployments.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/resource-exhaustion.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring the persistence layer or runtime environment for production deployment.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/runtime-environment-hardening.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring database connections and initializing `EntityManagerFactory` or `StandardServiceRegistry` in Hibernate ORM applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/secret-handling.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Configuring, programmatically executing, or automating database schema migrations and validation actions to prevent inconsistent states or destructive changes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/hibernate-orm/7-4-5/security-control-integrity.md",
+                  "path": "/downloads/java/hibernate-orm/7-4-5/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "jsoup",
+          "name": "Jsoup",
+          "latestVersion": "jsoup-1-23-1",
+          "versions": [
+            {
+              "version": "jsoup.1.23.1",
+              "versionSlug": "jsoup-1-23-1",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/jsoup/jsoup-1-23-1/",
+              "path": "/libraries/java/jsoup/jsoup-1-23-1/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1.md",
+              "bundlePath": "/downloads/java/jsoup/jsoup-1-23-1.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/jsoup/jsoup-1-23-1/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When programmatically setting attributes, querying text nodes, or instantiating attributes using Jsoup.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/api-contract-misuse.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "When configuring HTTP or proxy authentication for Jsoup connection sessions and requests to verify identity and supply credentials.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/authentication.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/authentication.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building dynamic CSS selector queries or regex pseudo-selectors using untrusted user input.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/injection.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When validating untrusted DOM nodes or HTML fragments against expected structure, namespaces, and safelist rules before processing or rendering.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/input-contract-definition.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When parsing untrusted HTML/XML streams, resolving relative URLs, or processing input attributes and character entities.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/input-interpretation-safety.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Making HTTP POST or HEAD requests where redirect semantics must be explicitly controlled to prevent automatic re-transmission of sensitive payloads across network boundaries.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/interface-protocol-hardening.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring outbound HTTP/HTTPS connections and sessions to route traffic through authorized proxy endpoints.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/network-boundary.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/network-boundary.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "When outputting untrusted data into HTML or attribute contexts or serializing documents to string representations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/output-encoding.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "fetching and parsing remote content, network connections, or untrusted HTML and XML inputs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/resource-exhaustion.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring request authenticators and handling sensitive headers or session tokens during connection requests across different origins or persistent thread pools.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/secret-handling.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When configuring and sharing Safelist and Cleaner instances across multiple concurrent threads in jsoup applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/security-control-integrity.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Managing multi-step HTTP interactions and session state in `Jsoup` connections to preserve isolated path-scoped cookie contexts.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/jsoup/jsoup-1-23-1/session-management.md",
+                  "path": "/downloads/java/jsoup/jsoup-1-23-1/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "kafka",
+          "name": "Kafka",
+          "latestVersion": "4-3-1",
+          "versions": [
+            {
+              "version": "4.3.1",
+              "versionSlug": "4-3-1",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/kafka/4-3-1/",
+              "path": "/libraries/java/kafka/4-3-1/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1.md",
+              "bundlePath": "/downloads/java/kafka/4-3-1.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/kafka/4-3-1/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When administering cluster security settings, defining topic or group access permissions, and configuring broker authorization mechanisms in Kafka.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/access-control.md",
+                  "path": "/downloads/java/kafka/4-3-1/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Implementing retry logic, custom exception handlers, or error management across Kafka clients, admin operations, and producers to handle transient network issues without masking fatal security or stat…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/api-contract-misuse.md",
+                  "path": "/downloads/java/kafka/4-3-1/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "When developers are configuring Kafka clients or brokers with SASL authentication mechanisms such as PLAIN, SCRAM, or OAuthBearer to verify identities.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/authentication.md",
+                  "path": "/downloads/java/kafka/4-3-1/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Building Kafka Streams or Kafka Connect applications that must safely isolate production errors, deserialization failures, or unprocessable records without causing data loss or application downtime.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/boundary-control.md",
+                  "path": "/downloads/java/kafka/4-3-1/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring security provider class names and dynamically instantiating Java Security Providers via `security.providers` configuration settings.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/configuration-source-integrity.md",
+                  "path": "/downloads/java/kafka/4-3-1/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Configuring OAuthBearer client assertions and signing algorithms when establishing secure authentication mechanisms in Kafka clients.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/cryptography.md",
+                  "path": "/downloads/java/kafka/4-3-1/cryptography.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "When parsing untrusted JSON payloads or template configuration files in Kafka Connect or client security components.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/deserialization.md",
+                  "path": "/downloads/java/kafka/4-3-1/deserialization.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "Configuring Kerberos keytab files for authentication in Kafka environments.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/file-handling.md",
+                  "path": "/downloads/java/kafka/4-3-1/file-handling.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When building ACL bindings, filters, or administrative configuration requests in Kafka applications to ensure all resource types, pattern types, operations, and permission types are explicitly specifi…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/input-contract-definition.md",
+                  "path": "/downloads/java/kafka/4-3-1/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When validating topic names in client applications or via topic policies to ensure unambiguous input interpretation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/input-interpretation-safety.md",
+                  "path": "/downloads/java/kafka/4-3-1/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Developing or configuring Kafka custom transport layers, network handlers, or protocol authentication mechanisms where incoming request headers and API keys must be strictly verified.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/interface-protocol-hardening.md",
+                  "path": "/downloads/java/kafka/4-3-1/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring administrative or management connections to Kafka KRaft cluster controllers to ensure control-plane endpoints remain segregated from data-plane client traffic.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/network-boundary.md",
+                  "path": "/downloads/java/kafka/4-3-1/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Setting up administrative quotas, throttling policies, and group membership limits to prevent Denial of Service from excessive producer, consumer, or coordinator loads.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/resource-exhaustion.md",
+                  "path": "/downloads/java/kafka/4-3-1/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring brokers, clients, connectors, or mirror makers where sensitive credentials like passwords, private keys, and client secrets need to be supplied securely without hardcoding plaintext values…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/secret-handling.md",
+                  "path": "/downloads/java/kafka/4-3-1/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Developing Kafka producers that send records to a cluster and must ensure delivery persistence and transaction reliability.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/security-control-integrity.md",
+                  "path": "/downloads/java/kafka/4-3-1/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "When configuring client connections and broker security parameters for SASL authentication to ensure session expiration and periodic re-authentication.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/kafka/4-3-1/session-management.md",
+                  "path": "/downloads/java/kafka/4-3-1/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "keycloak",
+          "name": "Keycloak",
+          "latestVersion": "26-7-0",
+          "versions": [
+            {
+              "version": "26.7.0",
+              "versionSlug": "26-7-0",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/keycloak/26-7-0/",
+              "path": "/libraries/java/keycloak/26-7-0/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0.md",
+              "bundlePath": "/downloads/java/keycloak/26-7-0.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/keycloak/26-7-0/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When developers and administrators are configuring permissions, assigning roles, or managing client access to ensure users and services only have access to required resources.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/access-control.md",
+                  "path": "/downloads/java/keycloak/26-7-0/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Developing credential issuance workflows where verifiable credentials must be signed using specific credential body objects and signers.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/api-contract-misuse.md",
+                  "path": "/downloads/java/keycloak/26-7-0/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Setting up user credential policies, password hashing, brute-force protection, and authentication flows requiring secondary or multi-factor verification.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/authentication.md",
+                  "path": "/downloads/java/keycloak/26-7-0/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Exchanging an authorization code for an access token at the server boundary where request parameters cross into state validation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/boundary-control.md",
+                  "path": "/downloads/java/keycloak/26-7-0/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "When importing realm representations programmatically and configuring settings such as brute force protection attributes to ensure configuration integrity and prevent validation failures.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/configuration-source-integrity.md",
+                  "path": "/downloads/java/keycloak/26-7-0/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Configuring cryptographic signature algorithms, document encryption, and token verification settings for SAML and OIDC protocols.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/cryptography.md",
+                  "path": "/downloads/java/keycloak/26-7-0/cryptography.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "When defining parameterized scopes, configuring user profile attributes, or setting OIDC token endpoint request parameter constraints in Keycloak.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/input-contract-definition.md",
+                  "path": "/downloads/java/keycloak/26-7-0/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-driven-boundary-selection",
+                  "title": "Input Driven Boundary Selection",
+                  "description": "When querying decision evaluation endpoints for resources defined with wildcard URIs in Keycloak authorization requests.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/input-driven-boundary-selection.md",
+                  "path": "/downloads/java/keycloak/26-7-0/input-driven-boundary-selection.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When implementing OAuth 2.0 or OID4VC credential issuance workflows requiring parsing and validation of Rich Authorization Requests.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/input-interpretation-safety.md",
+                  "path": "/downloads/java/keycloak/26-7-0/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Developing or configuring client integrations and protocol endpoints in Keycloak to prevent parameter pollution, cross-interface abuse, and request smuggling.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/interface-protocol-hardening.md",
+                  "path": "/downloads/java/keycloak/26-7-0/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring transport security, reverse proxy headers, and trusted proxy addresses for Keycloak realms, administration, and inter-node communication.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/network-boundary.md",
+                  "path": "/downloads/java/keycloak/26-7-0/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Parsing incoming deflated SAML HTTP-Redirect or POST bindings in Keycloak endpoints and adapters to prevent decompression bombs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/resource-exhaustion.md",
+                  "path": "/downloads/java/keycloak/26-7-0/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring Keycloak for production deployment to replace volatile or development environments with production-grade backends.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/runtime-environment-hardening.md",
+                  "path": "/downloads/java/keycloak/26-7-0/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "When running Admin CLI commands or configuring local tool sessions that generate configuration files containing active tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/secret-handling.md",
+                  "path": "/downloads/java/keycloak/26-7-0/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When configuring client authentication flow overrides, defining client policies, or upgrading client configurations in Keycloak to ensure security controls remain correctly applied and do not fail ope…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/security-control-integrity.md",
+                  "path": "/downloads/java/keycloak/26-7-0/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Developing or configuring Keycloak realms, clients, and custom providers to enforce strict session lifespans, validate active session state, and perform session revocation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/keycloak/26-7-0/session-management.md",
+                  "path": "/downloads/java/keycloak/26-7-0/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "netty",
+          "name": "Netty",
+          "latestVersion": "netty-4-2-16-final",
+          "versions": [
+            {
+              "version": "netty.4.2.16.final",
+              "versionSlug": "netty-4-2-16-final",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/netty/netty-4-2-16-final/",
+              "path": "/libraries/java/netty/netty-4-2-16-final/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final.md",
+              "bundlePath": "/downloads/java/netty/netty-4-2-16-final.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/netty/netty-4-2-16-final/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Implementing custom Netty `ChannelHandler` authorization logic or managing outbound proxy connections via `HttpProxyHandler` or `Socks5ProxyHandler`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/access-control.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Developing or maintaining channel handlers in Netty pipelines that process inbound and outbound events and handle uncaught exceptions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/api-contract-misuse.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Configuring mutual TLS (mTLS) authentication for QUIC servers in Netty to ensure connecting clients are properly authenticated.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/authentication.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/authentication.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Configuring `SslContext` and client connections for Netty secure communications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/cryptography.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/cryptography.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Configuring class resolution for dynamic loading or setting up native library working directories in Netty applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/dangerous-execution.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/dangerous-execution.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "When configuring decoders like `CompatibleMarshallingDecoder` to unmarshal network byte streams into Java objects.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/deserialization.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/deserialization.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "Use when performing reflective access to internal classes, constructors, or fields, or when dynamically loading providers via reflection.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/escape-hatch.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/escape-hatch.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "Handling incoming HTTP multipart form uploads, file uploads, and temporary attributes in Netty.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/file-handling.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/file-handling.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Configuring network protocol decoders, HTTP codecs, and frame decoders to ingest untrusted data safely.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/input-interpretation-safety.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "memory-safety",
+                  "title": "Memory Safety",
+                  "description": "Managing the lifecycle of Netty's `ReferenceCountedOpenSslContext` and `ReferenceCountedOpenSslEngine` native resources.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/memory-safety.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/memory-safety.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Developing local inter-process communication (IPC) channels, server sockets, or datagram connections using Netty transports that require strict interface isolation and peer validation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/network-boundary.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/network-boundary.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Use when constructing HTTP/2 headers or translating HTTP/1.x objects to HTTP/2 frames to prevent header injection and control character smuggling.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/output-encoding.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Setting up Netty network services, QUIC servers, or SSL contexts where malicious clients could trigger resource exhaustion or memory denial-of-service.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/resource-exhaustion.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring Netty applications in environments enforcing Java SecurityManager restrictions, modular encapsulation, or custom platform permissions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/runtime-environment-hardening.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring QUIC SSL contexts in non-development environments to prevent dumping session secrets.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/secret-handling.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/secret-handling.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "When instantiating server SSL contexts and setting explicit upper bounds for session cache size and timeouts to prevent unbounded memory consumption from cached TLS sessions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/netty/netty-4-2-16-final/session-management.md",
+                  "path": "/downloads/java/netty/netty-4-2-16-final/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "slug": "quarkus",
           "name": "Quarkus",
           "latestVersion": "3-38-0",
@@ -2045,6 +3196,137 @@
               ]
             }
           ]
+        },
+        {
+          "slug": "spring-security",
+          "name": "Spring Security",
+          "latestVersion": "7-1-0",
+          "versions": [
+            {
+              "version": "7.1.0",
+              "versionSlug": "7-1-0",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/java/spring-security/7-1-0/",
+              "path": "/libraries/java/spring-security/7-1-0/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0.md",
+              "bundlePath": "/downloads/java/spring-security/7-1-0.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/0_security_blueprint.md",
+              "blueprintPath": "/downloads/java/spring-security/7-1-0/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Configuring HTTP request authorization rules and default fallback restrictions across servlet or reactive applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/access-control.md",
+                  "path": "/downloads/java/spring-security/7-1-0/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When enabling feature DSLs like `.oneTimeTokenLogin()` that require explicitly provided handlers or service beans to prevent context initialization or runtime failures.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/api-contract-misuse.md",
+                  "path": "/downloads/java/spring-security/7-1-0/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Integrating SAML 2.0 authentication providers and validating signed responses and assertions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/authentication.md",
+                  "path": "/downloads/java/spring-security/7-1-0/authentication.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Use when configuring cross-origin request handling, registering CORS filters, or defining CORS configuration sources for servlet or reactive Spring Security applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/configuration-source-integrity.md",
+                  "path": "/downloads/java/spring-security/7-1-0/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Configuring cryptographic signature verification, message signing, and encryption for SAML 2.0 components and OAuth 2.0 JWT tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/cryptography.md",
+                  "path": "/downloads/java/spring-security/7-1-0/cryptography.md"
+                },
+                {
+                  "slug": "csrf",
+                  "title": "CSRF",
+                  "description": "Configuring Spring Security `HttpSecurity` or `ServerHttpSecurity` for web applications relying on cookie-based sessions or browser interactions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/csrf.md",
+                  "path": "/downloads/java/spring-security/7-1-0/csrf.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "Configuring custom row mappers or credential deserializers via `setRowMapper(...)` or `setCredentialsDeserializer(...)` in `JdbcAssertingPartyMetadataRepository`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/deserialization.md",
+                  "path": "/downloads/java/spring-security/7-1-0/deserialization.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Implementing dynamic client registration in Spring Security OAuth 2.0 Authorization Server to handle custom metadata inputs securely.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/input-contract-definition.md",
+                  "path": "/downloads/java/spring-security/7-1-0/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Configuring JWT decoders for OAuth 2.0 and validating incoming token type headers to ensure security decisions use unambiguous token purpose interpretations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/input-interpretation-safety.md",
+                  "path": "/downloads/java/spring-security/7-1-0/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Developing or configuring OAuth 2.0 / OIDC clients, resource servers, authorization endpoints, and redirection callbacks where framing, caching headers, method constraints, and strict URI validation m…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/interface-protocol-hardening.md",
+                  "path": "/downloads/java/spring-security/7-1-0/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Deploying Spring Security applications behind a reverse proxy or load balancer to ensure that OAuth 2.0 redirect URIs resolve accurately using trusted network configuration.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/network-boundary.md",
+                  "path": "/downloads/java/spring-security/7-1-0/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Handling initial user authentication and subsequent requests to prevent CPU and memory exhaustion caused by repeated password hashing.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/resource-exhaustion.md",
+                  "path": "/downloads/java/spring-security/7-1-0/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring the application environment for production deployment.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/runtime-environment-hardening.md",
+                  "path": "/downloads/java/spring-security/7-1-0/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring OAuth2 clients, resources, or token introspection in Spring Security applications where credentials and client secrets are required.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/secret-handling.md",
+                  "path": "/downloads/java/spring-security/7-1-0/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When implementing custom validation logic for OAuth2 authorization requests or pushed authorization requests to prevent bypassing validation checks.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/security-control-integrity.md",
+                  "path": "/downloads/java/spring-security/7-1-0/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Handling user logout, clearing remember-me cookies, and managing OIDC or server-side session termination.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/java/spring-security/7-1-0/session-management.md",
+                  "path": "/downloads/java/spring-security/7-1-0/session-management.md"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -2180,6 +3462,88 @@
                   "description": "When making requests from a frontend application to a cross-origin API that relies on session cookies for authentication.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/axios/v1-19-0/session-management.md",
                   "path": "/downloads/javascript/axios/v1-19-0/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "commander-js",
+          "name": "Commander Js",
+          "latestVersion": "v15-0-0",
+          "versions": [
+            {
+              "version": "v15.0.0",
+              "versionSlug": "v15-0-0",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/javascript/commander-js/v15-0-0/",
+              "path": "/libraries/javascript/commander-js/v15-0-0/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0.md",
+              "bundlePath": "/downloads/javascript/commander-js/v15-0-0.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/0_security_blueprint.md",
+              "blueprintPath": "/downloads/javascript/commander-js/v15-0-0/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Developing administrative or internal CLI subcommands and options where sensitive actions must be restricted regardless of whether help documentation suppresses their display.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/access-control.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/access-control.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Defining sensitive, internal, or administrative CLI subcommands and options that should not cross trust boundaries or leak into typo suggestions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/boundary-control.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "When binding CLI options to environment variables using `.env()` or handling ambient process configuration values.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/configuration-source-integrity.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Defining stand-alone executable subcommands with `.command(name, description, opts)` where process spawning or binary name resolution occurs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/dangerous-execution.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/dangerous-execution.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Defining command-line options and arguments that require strict input validation boundaries and enumerated value allowlisting.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/input-contract-definition.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When writing custom argument or option parser functions in Commander to parse untrusted user input.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/input-interpretation-safety.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "When configuring custom output hooks via `program.configureOutput()` to handle error messages or command output containing untrusted user input before rendering to stdout or stderr streams.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/output-encoding.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/output-encoding.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Defining options or arguments that handle sensitive values or tokens to ensure they are not leaked in plaintext through automated help documentation.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/secret-handling.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Embedding Commander inside long-running process environments, web services, or test runners where process.exit() should not be invoked on validation failure or help output.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/commander-js/v15-0-0/security-control-integrity.md",
+                  "path": "/downloads/javascript/commander-js/v15-0-0/security-control-integrity.md"
                 }
               ]
             }
@@ -2586,6 +3950,95 @@
           ]
         },
         {
+          "slug": "handlebars-js",
+          "name": "Handlebars Js",
+          "latestVersion": "v4-7-9",
+          "versions": [
+            {
+              "version": "v4.7.9",
+              "versionSlug": "v4-7-9",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/javascript/handlebars-js/v4-7-9/",
+              "path": "/libraries/javascript/handlebars-js/v4-7-9/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9.md",
+              "bundlePath": "/downloads/javascript/handlebars-js/v4-7-9.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/0_security_blueprint.md",
+              "blueprintPath": "/downloads/javascript/handlebars-js/v4-7-9/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Rendering templates with context objects where prototype properties and methods must be restricted to prevent unauthorized access or prototype pollution.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/access-control.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Rendering templates that use dynamic partial names resolved at runtime.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/api-contract-misuse.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Compiling Handlebars templates that utilize partials and require isolation of context data across boundaries.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/boundary-control.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/boundary-control.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Building and running applications using the standalone Handlebars runtime environment where dynamic template compilation is restricted.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/dangerous-execution.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/dangerous-execution.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "When wrapping custom string values to prevent Handlebars from applying automatic HTML escaping.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/escape-hatch.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/escape-hatch.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Extending Handlebars.JavaScriptCompiler or programmatically invoking the precompiler API with custom configuration options.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/injection.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Compiling Handlebars templates that require explicit data bindings and property validations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/input-contract-definition.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Compiling template strings or processing custom abstract syntax trees in Handlebars to prevent parser bypass and AST type confusion.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/input-interpretation-safety.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Rendering dynamic or user-supplied data within Handlebars templates and custom helpers to prevent cross-site scripting.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/output-encoding.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/output-encoding.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When compiling untrusted template strings to enforce strict compilation boundaries and prevent dynamic resolution of unlisted functions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/handlebars-js/v4-7-9/security-control-integrity.md",
+                  "path": "/downloads/javascript/handlebars-js/v4-7-9/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "slug": "joi",
           "name": "Joi",
           "latestVersion": "v18-2-3",
@@ -2847,6 +4300,60 @@
                   "description": "Setting up Multer middleware to process multipart form data and file uploads in a Node.js application.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/multer/v2-2-0/resource-exhaustion.md",
                   "path": "/downloads/javascript/multer/v2-2-0/resource-exhaustion.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "passport",
+          "name": "Passport",
+          "latestVersion": "v0-7-0",
+          "versions": [
+            {
+              "version": "v0.7.0",
+              "versionSlug": "v0-7-0",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/javascript/passport/v0-7-0/",
+              "path": "/libraries/javascript/passport/v0-7-0/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0.md",
+              "bundlePath": "/downloads/javascript/passport/v0-7-0.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/0_security_blueprint.md",
+              "blueprintPath": "/downloads/javascript/passport/v0-7-0/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Implementing protected routes or dashboard endpoints where authentication strategies may pass execution or permit unauthenticated requests to proceed down the middleware stack.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/access-control.md",
+                  "path": "/downloads/javascript/passport/v0-7-0/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Configuring `passport.authenticate()` options or invoking asynchronous login and logout methods where API contract compliance is required.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/api-contract-misuse.md",
+                  "path": "/downloads/javascript/passport/v0-7-0/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Configuring standard authentication middleware routes or implementing custom callbacks with `passport.authenticate()`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/authentication.md",
+                  "path": "/downloads/javascript/passport/v0-7-0/authentication.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When building applications that require isolated authentication contexts, such as multi-tenant systems or decoupled sub-applications running within the same process.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/security-control-integrity.md",
+                  "path": "/downloads/javascript/passport/v0-7-0/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Implementing user login and logout workflows that manage persistent authentication sessions using Passport.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/passport/v0-7-0/session-management.md",
+                  "path": "/downloads/javascript/passport/v0-7-0/session-management.md"
                 }
               ]
             }
@@ -3703,6 +5210,130 @@
           ]
         },
         {
+          "slug": "celery",
+          "name": "Celery",
+          "latestVersion": "v5-6-3",
+          "versions": [
+            {
+              "version": "v5.6.3",
+              "versionSlug": "v5-6-3",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/python/celery/v5-6-3/",
+              "path": "/libraries/python/celery/v5-6-3/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3.md",
+              "bundlePath": "/downloads/python/celery/v5-6-3.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/0_security_blueprint.md",
+              "blueprintPath": "/downloads/python/celery/v5-6-3/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When operators manage Celery workers, monitor task queues, or execute administrative commands like `celery purge` and `celery shell`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/access-control.md",
+                  "path": "/downloads/python/celery/v5-6-3/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Developing workflows that construct, freeze, and asynchronously execute Celery signature instances.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/api-contract-misuse.md",
+                  "path": "/downloads/python/celery/v5-6-3/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Setting up Celery connection URIs or transport options with external database and cache backends requiring authentication.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/authentication.md",
+                  "path": "/downloads/python/celery/v5-6-3/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Instantiating dynamic, per-tenant Celery app instances to segregate broker URLs, virtual hosts, or result backends in multi-threaded environments.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/boundary-control.md",
+                  "path": "/downloads/python/celery/v5-6-3/boundary-control.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Configuring Celery message serialization, task signing, and public-key signature verification using RSA certificates and private keys.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/cryptography.md",
+                  "path": "/downloads/python/celery/v5-6-3/cryptography.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Defining Celery tasks and handling incoming task message payloads that could otherwise lead to arbitrary code execution if dynamic callables are evaluated.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/dangerous-execution.md",
+                  "path": "/downloads/python/celery/v5-6-3/dangerous-execution.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "Configuring Celery workers, custom message consumers, and client applications to deserialize task messages and results securely.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/deserialization.md",
+                  "path": "/downloads/python/celery/v5-6-3/deserialization.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "Writing daemon process lock files or launching detached background Celery worker processes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/file-handling.md",
+                  "path": "/downloads/python/celery/v5-6-3/file-handling.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Defining and validating input parameters received from broker messages using Pydantic models in Celery tasks.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/input-contract-definition.md",
+                  "path": "/downloads/python/celery/v5-6-3/input-contract-definition.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "When converting task request contexts into task signatures during retries or manually forwarding message headers.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/interface-protocol-hardening.md",
+                  "path": "/downloads/python/celery/v5-6-3/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring transport and result backend connections in Celery across network boundaries to prevent interception and unauthorized access.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/network-boundary.md",
+                  "path": "/downloads/python/celery/v5-6-3/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "When defining tasks, configuring workers, and handling long-running or unbounded operations in Celery applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/resource-exhaustion.md",
+                  "path": "/downloads/python/celery/v5-6-3/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring production runtime environments and process privileges for Celery background workers to minimize attack surface and prevent host compromise.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/runtime-environment-hardening.md",
+                  "path": "/downloads/python/celery/v5-6-3/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring Celery message brokers, database result backends, or cloud storage connections.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/secret-handling.md",
+                  "path": "/downloads/python/celery/v5-6-3/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "When initializing certificate stores and loading security credentials for message signing or verification in Celery.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/celery/v5-6-3/security-control-integrity.md",
+                  "path": "/downloads/python/celery/v5-6-3/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "slug": "click",
           "name": "Click",
           "latestVersion": "8-4-2",
@@ -4202,7 +5833,7 @@
                 {
                   "slug": "cryptography",
                   "title": "Cryptography",
-                  "description": "When registering new users or validating user login credentials in a web application.",
+                  "description": "When registering new users, validating user login credentials, or persisting sensitive user data in the application database.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3/cryptography.md",
                   "path": "/downloads/python/flask/3-1-3/cryptography.md"
                 },
@@ -4216,14 +5847,14 @@
                 {
                   "slug": "dangerous-execution",
                   "title": "Dangerous Execution",
-                  "description": "Configuring deployment settings and launching the application in a production environment.",
+                  "description": "Configuring deployment settings and launching the application in a production environment, or evaluating an expression supplied by a request.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3/dangerous-execution.md",
                   "path": "/downloads/python/flask/3-1-3/dangerous-execution.md"
                 },
                 {
                   "slug": "escape-hatch",
                   "title": "Escape Hatch",
-                  "description": "Rendering trusted field widget calls within template macros where HTML structure must be preserved.",
+                  "description": "Rendering trusted field widget calls within template macros where HTML structure must be preserved, or displaying HTML that was authored by a user and stored by the application.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3/escape-hatch.md",
                   "path": "/downloads/python/flask/3-1-3/escape-hatch.md"
                 },
@@ -4237,7 +5868,7 @@
                 {
                   "slug": "injection",
                   "title": "Injection",
-                  "description": "Writing database queries with dynamic user input in Flask applications.",
+                  "description": "Writing database queries with dynamic user input, or recording user-controlled values in application logs.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3/injection.md",
                   "path": "/downloads/python/flask/3-1-3/injection.md"
                 },
@@ -6783,6 +8414,123 @@
           ]
         },
         {
+          "slug": "swift-nio",
+          "name": "Swift Nio",
+          "latestVersion": "2-101-3",
+          "versions": [
+            {
+              "version": "2.101.3",
+              "versionSlug": "2-101-3",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/swift/swift-nio/2-101-3/",
+              "path": "/libraries/swift/swift-nio/2-101-3/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3.md",
+              "bundlePath": "/downloads/swift/swift-nio/2-101-3.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/0_security_blueprint.md",
+              "blueprintPath": "/downloads/swift/swift-nio/2-101-3/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "Creating or modifying files and directories, or inspecting file metadata for authorization and permission checks in Swift NIO.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/access-control.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "When configuring network bootstraps with dynamic event loop groups or verifying event loop thread isolation for state mutations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/api-contract-misuse.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "When implementing protocol upgrades such as transitioning from HTTP/1.1 to WebSocket using client upgrade handlers where payload data may arrive in the same TCP chunk as the protocol response head.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/boundary-control.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Resolving home directory paths or security-sensitive configuration file locations within application startup or user session initialization.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/configuration-source-integrity.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "Interacting with low-level file handles or performing native system operations using raw POSIX file descriptors.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/escape-hatch.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/escape-hatch.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "When creating new files or replacing existing files on disk to prevent race conditions, unauthorized access, or partial file materialization.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/file-handling.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Constructing dynamic HTTP headers in SwiftNIO before outbound transmission to prevent header injection and request smuggling.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/injection.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Developing networking code using Swift NIO where untrusted input is passed to buffer indexing APIs or HTTP header population methods.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/input-contract-definition.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "When processing comma-separated HTTP headers like `connection` or `set-cookie` using `HTTPHeaders`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/input-interpretation-safety.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Configuring HTTP client and server channels, encoders, and pipelines in SwiftNIO to prevent request/response smuggling and header injection.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/interface-protocol-hardening.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "memory-safety",
+                  "title": "Memory Safety",
+                  "description": "Handling low-level buffer pointer access via APIs like `withUnsafeReadableBytes`, `withVeryUnsafeMutableBytes`, or pooled buffer storage management in SwiftNIO.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/memory-safety.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/memory-safety.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring network boundary bindings and inspecting host network interfaces using SwiftNIO socket and interface APIs.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/network-boundary.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/network-boundary.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "When setting up HTTP or WebSocket servers and decoders in SwiftNIO to process untrusted network payloads.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/resource-exhaustion.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Configuring runtime file descriptors and open options when the application executes subprocesses to prevent handle leaks.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/swift/swift-nio/2-101-3/runtime-environment-hardening.md",
+                  "path": "/downloads/swift/swift-nio/2-101-3/runtime-environment-hardening.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "slug": "vapor",
           "name": "Vapor",
           "latestVersion": "4-122-0",
@@ -6921,6 +8669,165 @@
       "catalogUrl": "https://securitycards.rewarelabs.com/llms/typescript.txt",
       "bundleUrl": "https://securitycards.rewarelabs.com/downloads/typescript.md",
       "libraries": [
+        {
+          "slug": "adonisjs",
+          "name": "Adonisjs",
+          "latestVersion": "v7-3-5",
+          "versions": [
+            {
+              "version": "v7.3.5",
+              "versionSlug": "v7-3-5",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/typescript/adonisjs/v7-3-5/",
+              "path": "/libraries/typescript/adonisjs/v7-3-5/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5.md",
+              "bundlePath": "/downloads/typescript/adonisjs/v7-3-5.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/0_security_blueprint.md",
+              "blueprintPath": "/downloads/typescript/adonisjs/v7-3-5/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When implementing controller actions, route handlers, or middleware that handle sensitive data mutations, access control, or resource retrieval.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/access-control.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Validating incoming request input using tryValidateUsing in AdonisJS controllers and inspecting the resulting error tuple.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/api-contract-misuse.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "Verifying user credentials during authentication or validating token-based and verification tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/authentication.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Processing incoming HTTP request data inside controllers before executing core business logic.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/boundary-control.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Validating and restricting allowed environment variables at application startup to ensure configuration integrity.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/configuration-source-integrity.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Implementing user authentication and password storage mechanisms in AdonisJS applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/cryptography.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/cryptography.md"
+                },
+                {
+                  "slug": "csrf",
+                  "title": "CSRF",
+                  "description": "Developing server-rendered form submissions using AdonisJS Shield.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/csrf.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/csrf.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "When handling user-uploaded files, defining storage paths, or serving file downloads to prevent path traversal and resource exhaustion.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/file-handling.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building database queries with dynamic user input using Lucid query builder or raw queries.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/injection.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Use when validating incoming request bodies, query parameters, or headers against strict schemas before processing data in controller actions.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/input-contract-definition.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-driven-boundary-selection",
+                  "title": "Input Driven Boundary Selection",
+                  "description": "When handling dynamic route parameters to select an OAuth provider or adapter in AdonisJS applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/input-driven-boundary-selection.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/input-driven-boundary-selection.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Parsing and processing incoming user verification tokens in request handlers.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/input-interpretation-safety.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Configuring the static file server to attach security-focused HTTP headers to protect against protocol confusion and MIME-sniffing vulnerabilities.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/interface-protocol-hardening.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "network-boundary",
+                  "title": "Network Boundary",
+                  "description": "Configuring AdonisJS HTTP settings behind a proxy to ensure correct handling of client IP addresses and prevent spoofing.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/network-boundary.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/network-boundary.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Rendering internationalized translation strings with dynamic user-supplied interpolation parameters inside Edge templates.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/output-encoding.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "Defining body parser configurations to restrict incoming payload sizes for JSON, form, and multipart requests in AdonisJS applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/resource-exhaustion.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Deploying the application to a production server where development route generation and debug tooling must be disabled.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/runtime-environment-hardening.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Configuring application settings, encryption keys, database connections, mail services, storage drivers, authentication guards, and API integrations.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/secret-handling.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Developing policy classes with `before()` hooks to control access to specific authorization actions in AdonisJS.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/security-control-integrity.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Configuring session cookie security options in AdonisJS applications",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/adonisjs/v7-3-5/session-management.md",
+                  "path": "/downloads/typescript/adonisjs/v7-3-5/session-management.md"
+                }
+              ]
+            }
+          ]
+        },
         {
           "slug": "bullmq",
           "name": "Bullmq",
@@ -7155,6 +9062,158 @@
                   "description": "When managing database transactions in SQLite with `db.transaction()` and handling errors inside transaction callbacks.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/drizzle-orm/0-45-2/security-control-integrity.md",
                   "path": "/downloads/typescript/drizzle-orm/0-45-2/security-control-integrity.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "feathers",
+          "name": "Feathers",
+          "latestVersion": "v5-0-46",
+          "versions": [
+            {
+              "version": "v5.0.46",
+              "versionSlug": "v5-0-46",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/typescript/feathers/v5-0-46/",
+              "path": "/libraries/typescript/feathers/v5-0-46/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46.md",
+              "bundlePath": "/downloads/typescript/feathers/v5-0-46.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/0_security_blueprint.md",
+              "blueprintPath": "/downloads/typescript/feathers/v5-0-46/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "access-control",
+                  "title": "Access Control",
+                  "description": "When managing user permissions, capabilities, roles, and administrative update boundaries across Feathers services and authentication flows.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/access-control.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/access-control.md"
+                },
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Handling and logging database exceptions thrown by the `@feathersjs/knex` adapter without leaking sensitive database details to clients.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/api-contract-misuse.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/api-contract-misuse.md"
+                },
+                {
+                  "slug": "authentication",
+                  "title": "Authentication",
+                  "description": "When establishing identity verification, registering authentication strategies, and protecting service or route endpoints in a Feathers application.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/authentication.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/authentication.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "Handling incoming requests from untrusted clients, extracting parameters from query contexts, or distinguishing external transport requests from internal service calls.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/boundary-control.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring application settings and environment variables in Feathers v5 applications where implicit automatic environment variable substitution is no longer supported by `@feathersjs/configuration`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/configuration-source-integrity.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "When defining data resolvers to prepare user credentials before saving them to the database in a Feathers application.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/cryptography.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/cryptography.md"
+                },
+                {
+                  "slug": "csrf",
+                  "title": "CSRF",
+                  "description": "Configuring authentication client token storage in Feathers applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/csrf.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/csrf.md"
+                },
+                {
+                  "slug": "deserialization",
+                  "title": "Deserialization",
+                  "description": "When processing incoming requests over HTTP REST transports where query parameters are deserialized strictly as strings.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/deserialization.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/deserialization.md"
+                },
+                {
+                  "slug": "file-handling",
+                  "title": "File Handling",
+                  "description": "Handling file uploads through Express middleware and Feathers services where uploaded file attributes must be validated.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/file-handling.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "When initializing MongoDB services in Feathers to restrict query update operators and prevent unauthorized field modification.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/injection.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Defining and validating incoming service data and query parameters using schema hooks to reject malformed input and unexpected properties.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/input-contract-definition.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/input-contract-definition.md"
+                },
+                {
+                  "slug": "input-driven-boundary-selection",
+                  "title": "Input Driven Boundary Selection",
+                  "description": "Building nested routes, deep links, or OAuth redirect flows in Feathers applications where route parameters and authentication tokens cross security boundaries.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/input-driven-boundary-selection.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/input-driven-boundary-selection.md"
+                },
+                {
+                  "slug": "input-interpretation-safety",
+                  "title": "Input Interpretation Safety",
+                  "description": "Configuring the express query parser in a Feathers application when handling URL query strings with large array parameters.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/input-interpretation-safety.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/input-interpretation-safety.md"
+                },
+                {
+                  "slug": "interface-protocol-hardening",
+                  "title": "Interface Protocol Hardening",
+                  "description": "Use when designing inter-component calls, configuring service methods, managing real-time channels, and transferring authentication context across network and application component boundaries.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/interface-protocol-hardening.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/interface-protocol-hardening.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Rendering dynamic user content or API responses into the browser DOM using properties like innerHTML.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/output-encoding.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "When accepting multipart file uploads and parsing JSON request bodies in a Feathers application.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/resource-exhaustion.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/resource-exhaustion.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "Developing client-side applications with Feathers and configuring the `@feathersjs/authentication-client` module for token persistence.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/secret-handling.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Developing Feathers service methods, custom authentication services, internal adapter operations, or handling request execution paths where security controls like hooks and setup initialization must r…",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/security-control-integrity.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/security-control-integrity.md"
+                },
+                {
+                  "slug": "session-management",
+                  "title": "Session Management",
+                  "description": "Implementing logout functionality or managing server-side session and token invalidation in Feathers applications.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/feathers/v5-0-46/session-management.md",
+                  "path": "/downloads/typescript/feathers/v5-0-46/session-management.md"
                 }
               ]
             }
@@ -8084,6 +10143,109 @@
                   "description": "When defining entity columns that store sensitive data or when configuring connection URLs with special characters.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/type-orm/1-1-0/secret-handling.md",
                   "path": "/downloads/typescript/type-orm/1-1-0/secret-handling.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "vue",
+          "name": "Vue",
+          "latestVersion": "v3-5-40",
+          "versions": [
+            {
+              "version": "v3.5.40",
+              "versionSlug": "v3-5-40",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/typescript/vue/v3-5-40/",
+              "path": "/libraries/typescript/vue/v3-5-40/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40.md",
+              "bundlePath": "/downloads/typescript/vue/v3-5-40.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/0_security_blueprint.md",
+              "blueprintPath": "/downloads/typescript/vue/v3-5-40/0_security_blueprint.md",
+              "categories": [
+                {
+                  "slug": "api-contract-misuse",
+                  "title": "API Contract Misuse",
+                  "description": "Developing computed properties for derived state in Vue components.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/api-contract-misuse.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/api-contract-misuse.md"
+                },
+                {
+                  "slug": "boundary-control",
+                  "title": "Boundary Control",
+                  "description": "When updating component data or passing state modifications from a child component back up to a parent component across the component state boundary.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/boundary-control.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/boundary-control.md"
+                },
+                {
+                  "slug": "configuration-source-integrity",
+                  "title": "Configuration Source Integrity",
+                  "description": "Configuring production bundlers and build workflows for Vue applications to prevent exposing development tooling, internal devtools hooks, or raw source maps.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/configuration-source-integrity.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/configuration-source-integrity.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "When defining component templates using Vue APIs such as `Vue.createApp({ template: ... })`.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/dangerous-execution.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/dangerous-execution.md"
+                },
+                {
+                  "slug": "escape-hatch",
+                  "title": "Escape Hatch",
+                  "description": "Rendering dynamic or user-supplied content inside Vue component templates where raw HTML injection could occur.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/escape-hatch.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/escape-hatch.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building dynamic styles and applying CSS properties using Vue style bindings",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/injection.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/injection.md"
+                },
+                {
+                  "slug": "input-contract-definition",
+                  "title": "Input Contract Definition",
+                  "description": "Defining and validating component boundaries such as props and emitted events to reject malformed or out-of-contract input before application processing.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/input-contract-definition.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/input-contract-definition.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "When rendering dynamic attributes like `:href` in Vue templates using untrusted data that may contain unsafe URL schemes.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/output-encoding.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/output-encoding.md"
+                },
+                {
+                  "slug": "resource-exhaustion",
+                  "title": "Resource Exhaustion",
+                  "description": "When processing large data structures or arrays of deeply nested objects in Vue components to prevent CPU and memory exhaustion.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/resource-exhaustion.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/resource-exhaustion.md"
+                },
+                {
+                  "slug": "runtime-environment-hardening",
+                  "title": "Runtime Environment Hardening",
+                  "description": "Deploying Vue applications to production environments or configuring build pipelines.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/runtime-environment-hardening.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/runtime-environment-hardening.md"
+                },
+                {
+                  "slug": "secret-handling",
+                  "title": "Secret Handling",
+                  "description": "persisting non-sensitive UI settings or application state in browser storage such as `localStorage` or `sessionStorage` in a Vue application.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/secret-handling.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/secret-handling.md"
+                },
+                {
+                  "slug": "security-control-integrity",
+                  "title": "Security Control Integrity",
+                  "description": "Exposing reactive state through Vue's `provide()` mechanism to descendant components.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/vue/v3-5-40/security-control-integrity.md",
+                  "path": "/downloads/typescript/vue/v3-5-40/security-control-integrity.md"
                 }
               ]
             }

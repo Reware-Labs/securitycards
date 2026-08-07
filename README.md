@@ -1,6 +1,8 @@
 # Security Cards
 
-Security Cards is a set of secure coding notes for popular open-source libraries. The cards are tied to specific library versions, so developers and coding agents can use guidance that matches the code they are working on.
+[![Install Security Cards](https://skills.sh/b/Reware-Labs/securitycards)](https://skills.sh/Reware-Labs/securitycards)
+
+Security Cards is an open source collection of library-specific security guidance for developers and AI coding agents. The cards are tied to specific library versions, so developers and agents can use guidance that matches the code they are working on.
 
 Each card says when it applies, then gives secure rules and code examples. You can browse the cards by language, library, version, and security category.
 
@@ -9,33 +11,11 @@ The cards are available at [securitycards.rewarelabs.com](https://securitycards.
 > [!IMPORTANT]
 > Security Cards can help with security work, but it is not a replacement for a professional security review. Read the [disclaimer](https://securitycards.rewarelabs.com/disclaimer/) for details.
 
-## Getting started
-
-### Prerequisites
-
-- Node.js 22.12 or later
-- npm
-
-### Run locally
-
-```bash
-git clone https://github.com/Reware-Labs/securitycards.git
-cd securitycards
-npm install
-npm run dev
-```
-
-Open [http://localhost:4321](http://localhost:4321) in your browser.
-
-Run the full set of checks with:
-
-```bash
-npm run validate
-```
-
 ## Use Security Cards as a skill
 
 The `securitycards` skill lets a coding agent look up and apply cards while it works. Install it with either `npx` or the GitHub CLI.
+
+The skill is instruction-only: it contains no executable scripts and requires no API keys. It fetches guidance from the public Security Cards catalog and cites the cards it applies.
 
 With `npx`:
 
@@ -73,10 +53,23 @@ Use Security Cards while implementing this file-upload endpoint. Apply the relev
 Review this authentication service using Security Cards. Only report issues you can verify in the code, and link to each card you used.
 ```
 
-### Review a specific dependency
+The [agent usage guide](https://securitycards.rewarelabs.com/agent-usage.md) describes the full workflow and lists the machine-readable resources available to agents.
 
-```text
-Check how this project uses Express with Security Cards. Read the installed version from the lockfile and only use cards for that version.
+## Local development
+
+To run the website locally or contribute changes, you will need Node.js 22.12 or later and npm.
+
+```bash
+git clone https://github.com/Reware-Labs/securitycards.git
+cd securitycards
+npm install
+npm run dev
 ```
 
-The [agent usage guide](https://securitycards.rewarelabs.com/agent-usage.md) describes the full workflow and lists the machine-readable resources available to agents.
+Open [http://localhost:4321](http://localhost:4321) in your browser.
+
+Run the full set of checks with:
+
+```bash
+npm run validate
+```

@@ -57,7 +57,18 @@ assert.equal(
   catalog.jsonCatalogUrl,
   'https://securitycards.rewarelabs.com/catalog.json',
 );
-assert.ok(markdownCatalog.length < llmsCatalog.length / 3);
+// /llms.txt is an index of language catalogs, not an inventory. Keeping it
+// small is the point: a 72 KB catalog was being truncated by agent fetch
+// tools, and the dropped half made supported libraries read as unsupported.
+assert.ok(
+  llmsCatalog.length < 4096,
+  `/llms.txt must stay a lean index; it is ${llmsCatalog.length} bytes`,
+);
+assert.doesNotMatch(
+  llmsCatalog,
+  /\/downloads\//,
+  '/llms.txt must link to language catalogs only, never to individual cards',
+);
 assert.match(markdownCatalog, /^# Security Cards Agent Usage$/m);
 assert.match(markdownCatalog, /^## Recommended: use the Security Cards skill$/m);
 assert.match(markdownCatalog, /npx skills add Reware-Labs\/securitycards --skill securitycards -g/);
@@ -71,22 +82,49 @@ assert.doesNotMatch(
   'The concise guide must not reproduce the exhaustive library inventory',
 );
 
+// Every library version must be reachable by the composition rule the language
+// catalogs and SKILL.md state: take `<prefix>` and a `<category>` verbatim off
+// the line, join them, and land on a file that exists. An agent has no other
+// way to build a card URL, so a prefix that does not compose is a 404 it cannot
+// recover from.
 for (const language of catalog.languages) {
   assert.match(llmsCatalog, new RegExp(escapeRegExp(language.catalogUrl)));
+
+  const languageCatalog = await read(artifactPathForUrl(language.catalogUrl));
+  const lines = languageCatalog.split('\n');
+
   for (const library of language.libraries) {
     assert.ok(
       library.versions.some(version => version.versionSlug === library.latestVersion),
       `${language.slug}/${library.slug} must identify a supported latest version`,
     );
     for (const version of library.versions) {
-      const urls = [
-        version.canonicalUrl,
-        version.bundleUrl,
-        version.blueprintUrl,
-        ...version.categories.map(card => card.canonicalUrl),
-      ].filter(Boolean);
-      for (const url of urls) {
-        assert.match(llmsCatalog, new RegExp(escapeRegExp(url)));
+      const line = lines.find(
+        candidate => candidate.startsWith(`${library.slug} ${version.version} `),
+      );
+      assert.ok(
+        line,
+        `${library.slug} ${version.version} is missing from ${language.catalogUrl}`,
+      );
+
+      const [, , prefix, ...categories] = line.split(' ');
+      assert.deepEqual(
+        categories,
+        version.categories.map(card => card.slug),
+        `${library.slug} ${version.version} lists categories the catalog does not have`,
+      );
+
+      // Composed exactly as the catalog header and SKILL.md instruct.
+      const composed = [
+        `${prefix}/0_security_blueprint.md`,
+        `${prefix}.md`,
+        ...categories.map(category => `${prefix}/${category}.md`),
+      ];
+      assert.ok(
+        composed.includes(version.blueprintUrl) || version.blueprintUrl === null,
+        `${library.slug} ${version.version} blueprint URL does not match the stated prefix`,
+      );
+      for (const url of [...composed, version.canonicalUrl]) {
         await access(join(dist, artifactPathForUrl(url)));
       }
     }
@@ -122,26 +160,40 @@ assert.doesNotMatch(
   'C++ library links must not use encoded or raw + characters',
 );
 
+// The card URLs moved to the per-language catalogs, so the language-slug
+// guards follow them there. /llms.txt still names both files, so the
+// no-encoded-characters checks stay meaningful on the index too.
+const [csharpCatalog, cppCatalog] = await Promise.all([
+  read('llms/csharp.txt'),
+  read('llms/cpp.txt'),
+]);
+
 assert.match(
-  llmsCatalog,
-  /https:\/\/securitycards\.rewarelabs\.com\/libraries\/csharp\/asp-net\/v10-0-10\//,
+  csharpCatalog,
+  /https:\/\/securitycards\.rewarelabs\.com\/downloads\/csharp\/asp-net\/v10-0-10 /,
   'catalog C# URLs must use the stable csharp language slug',
 );
-assert.doesNotMatch(
-  llmsCatalog,
-  /https:\/\/securitycards\.rewarelabs\.com\/(?:libraries|downloads|llms)\/c(?:%23|#)/,
-  'catalog URLs must not use encoded or raw # characters in C# paths',
-);
 assert.match(
-  llmsCatalog,
-  /https:\/\/securitycards\.rewarelabs\.com\/libraries\/cpp\/envoy\/v1-39-0\//,
+  cppCatalog,
+  /https:\/\/securitycards\.rewarelabs\.com\/downloads\/cpp\/envoy\/v1-39-0 /,
   'catalog C++ URLs must use the stable cpp language slug',
 );
-assert.doesNotMatch(
-  llmsCatalog,
-  /https:\/\/securitycards\.rewarelabs\.com\/(?:libraries|downloads|llms)\/c(?:%2B%2B|\+\+)/i,
-  'catalog URLs must not use encoded or raw + characters in C++ paths',
-);
+for (const [name, text] of [
+  ['/llms.txt', llmsCatalog],
+  ['/llms/csharp.txt', csharpCatalog],
+  ['/llms/cpp.txt', cppCatalog],
+]) {
+  assert.doesNotMatch(
+    text,
+    /https:\/\/securitycards\.rewarelabs\.com\/(?:libraries|downloads|llms)\/c(?:%23|#)/,
+    `${name} must not use encoded or raw # characters in C# paths`,
+  );
+  assert.doesNotMatch(
+    text,
+    /https:\/\/securitycards\.rewarelabs\.com\/(?:libraries|downloads|llms)\/c(?:%2B%2B|\+\+)/i,
+    `${name} must not use encoded or raw + characters in C++ paths`,
+  );
+}
 assert.match(
   integration,
   /https:\/\/securitycards\.rewarelabs\.com\/downloads\/csharp\/asp-net\/v10-0-10\.md/,

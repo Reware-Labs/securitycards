@@ -9,7 +9,7 @@ Category: injection
 
 **Use when**
 
-Writing database queries with dynamic user input in Flask applications.
+Writing database queries with dynamic user input, or recording user-controlled values in application logs.
 
 **Secure rules**
 
@@ -24,4 +24,15 @@ db.execute(
     (title, body, g.user['id'])
 )
 db.commit()
+```
+
+**Rule 2: Strip or escape carriage returns, line feeds, and other control characters before writing a user-controlled value to a log.**
+
+A value containing `\r` or `\n` forges additional log lines, letting an attacker fabricate entries or hide their own activity from anything that reads the log. Neutralize control characters before the value reaches the logger, and pass it as a logging argument rather than interpolating it into the message.
+
+```python
+def log_safe(value: str) -> str:
+    return value.encode("unicode_escape").decode("ascii")
+
+app.logger.info("login failed for user=%s", log_safe(username))
 ```
