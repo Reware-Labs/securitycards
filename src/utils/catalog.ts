@@ -174,57 +174,40 @@ export function renderCatalogMarkdown(catalog: SecurityCardsCatalog): string {
     0,
   );
 
+  // Deliberately an index, not an inventory. The full listing lives in the
+  // per-language catalogs, which stay small enough that a fetch tool cannot
+  // truncate one and leave an agent believing a supported library is missing.
   const lines = [
     '# Security Cards Catalog',
     '',
-    '> Complete machine-readable inventory for Security Cards by RewareLabs.',
+    '> Version-pinned secure-coding rules for open source libraries. Built by RewareLabs for AI coding tools.',
     '',
-    `Canonical catalog: ${catalog.catalogUrl}`,
-    `JSON catalog: ${catalog.jsonCatalogUrl}`,
-    `Platform usage guide: ${catalog.usageGuideUrl}`,
+    `${catalog.languages.length} languages, ${libraryCount} libraries, ${versionCount} library versions, ${cardCount} cards.`,
     '',
-    `Supported inventory: ${catalog.languages.length} languages, ${libraryCount} libraries, ${versionCount} library versions, and ${cardCount} category files.`,
+    '## Language catalogs',
     '',
-    '## Usage',
-    '',
-    '- Prefer the narrowest canonical URL that covers the task.',
-    '- Library and card URLs are version-pinned.',
-    '- An unavailable or malformed version redirects to the latest supported version for the exact language and library.',
-    '',
-    '## Languages',
+    'Open the one catalog for your language. Each lists every supported library in that language,',
+    'its exact supported versions, and the URL prefix the cards for those versions hang off.',
     '',
   ];
 
   for (const language of catalog.languages) {
-    lines.push(`- [${language.label}](${language.catalogUrl})`);
+    lines.push(`- ${language.label}: ${language.catalogUrl}`);
   }
 
-  for (const language of catalog.languages) {
-    lines.push('');
-    lines.push(`## ${language.label}`);
-    lines.push('');
-    lines.push(`Language catalog: ${language.catalogUrl}`);
-    lines.push(`All ${language.label} cards: ${language.bundleUrl}`);
-
-    for (const library of language.libraries) {
-      for (const version of library.versions) {
-        const latest = version.versionSlug === library.latestVersion ? ' — latest supported' : '';
-        lines.push('');
-        lines.push(`### ${library.name} ${version.version}${latest}`);
-        lines.push('');
-        lines.push(`- Canonical library page: ${version.canonicalUrl}`);
-        if (version.bundleUrl) {
-          lines.push(`- Combined Markdown bundle: ${version.bundleUrl}`);
-        }
-        if (version.blueprintUrl) {
-          lines.push(`- Security Blueprint: ${version.blueprintUrl}`);
-        }
-        for (const card of version.categories) {
-          lines.push(`- [${card.title}](${card.canonicalUrl}): ${card.description}`);
-        }
-      }
-    }
-  }
+  lines.push(
+    '',
+    '## Rules',
+    '',
+    '- Fetch with a tool that returns the response verbatim, such as `curl -fsS <url>`. A tool that summarizes or truncates drops the URLs you need.',
+    '- Card URLs are pinned to one library version. Match the resolved version exactly and never substitute a nearby release.',
+    '- An unavailable or malformed version redirects to the latest supported version for that language and library. Check the final URL before treating a card as an exact match.',
+    '',
+    '## Also available',
+    '',
+    `- Agent usage guide: ${catalog.usageGuideUrl}`,
+    `- Every language in one JSON file, large — raw-bytes tools only: ${catalog.jsonCatalogUrl}`,
+  );
 
   return `${lines.join('\n')}\n`;
 }
@@ -254,7 +237,7 @@ export function renderUsageGuideMarkdown(catalog: SecurityCardsCatalog): string 
     '## How to use Security Cards',
     '',
     '1. Check the project’s manifests and lockfiles to identify the libraries and versions actually in use.',
-    `2. Find those versions in the [JSON catalog](${catalog.jsonCatalogUrl}). If needed, use the [text catalog](${catalog.catalogUrl}) instead.`,
+    `2. Open the [catalog index](${catalog.catalogUrl}), follow the link to your language’s catalog (\`/llms/<language>.txt\`), and find the line for your library and version. That line ends with the complete list of categories published for the version, and gives the URL prefix its cards hang off. Fetch with a tool that returns raw bytes, such as \`curl -fsS\`; a tool that summarizes or truncates can silently drop your library and make a supported version look unsupported. The [full JSON catalog](${catalog.jsonCatalogUrl}) holds every language at once and is large — reach for it only when you need the whole inventory.`,
     '3. Use cards that match the project’s exact library version. If that version is not listed, explain what is unsupported and show the versions that are available instead of borrowing guidance from another version.',
     '4. When starting a project or learning a library, begin with its Security Blueprint. For focused work, choose the category card closest to the task. Use the full library bundle when several categories are relevant.',
     '5. Apply the relevant **secure rules**, run appropriate tests or checks, and review the finished code against the rules used.',

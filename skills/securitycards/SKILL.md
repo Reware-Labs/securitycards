@@ -5,43 +5,73 @@ description: Apply version-specific secure coding guidance to AI-generated or hu
 
 # Security Cards
 
-Use live, version-pinned guidance from `https://securitycards.rewarelabs.com` as the source of truth. Inspect and cite the guidance; do not treat this skill as an offline security knowledge base.
+Version-pinned secure-coding rules for open source libraries, served live from `https://securitycards.rewarelabs.com`. Fetch the rules for the versions the project actually uses, then apply them. This skill is an index and a workflow, not an offline security knowledge base.
 
-## Resolve dependencies
+## Fetching
 
-1. Inspect the project before selecting guidance. Identify the language, library, and exact resolved version from lockfiles or another reliable source for installed dependencies.
-2. For a new project with no resolved dependencies, use the live catalog to show the supported versions. After the user selects a version, generate the lockfile or equivalent and verify the resolved version before applying its guidance.
-3. Do not rely on a manifest range, requested version, or guessed version when a resolved version is available.
-4. Fetch `https://securitycards.rewarelabs.com/catalog.json`. If that endpoint is unavailable, fetch `https://securitycards.rewarelabs.com/llms.txt` instead. Find an exact language, library, and version match. Normalize the version only when the match is unambiguous, such as treating `5.9.0` and `v5.9.0` as equal. Never select a nearby release. Use the URLs from the matched catalog entry instead of constructing download URLs from memory.
+Every URL here returns plain text or Markdown meant to be read as-is. Use whatever gives you the raw response — a shell fetch such as `curl -fsS <url>` works well. A fetch tool that summarizes pages returns the rules as prose with the code examples and URLs stripped out, which is not enough to act on. Get the raw text, or tell the user you cannot and stop.
+
+## Resolve the version
+
+Take the exact installed version from the lockfile or the installed package. A manifest range, a requested version, or a remembered one is not enough — guidance differs between releases.
+
+For a new project, choose a supported version from the catalog, install it, then read the resolved version back before applying anything.
+
+## Find the cards
+
+Fetch `https://securitycards.rewarelabs.com/llms.txt`, which lists one catalog per language. Fetch the catalog for your language, e.g. `https://securitycards.rewarelabs.com/llms/python.txt`.
+
+A language catalog holds one line per supported library version:
+
+```
+<library> <version> <prefix> <category>...
+```
+
+Find the line where library and version both match. `<prefix>` is a URL prefix with no trailing slash; append to it for raw Markdown:
+
+- `<prefix>/0_security_blueprint.md` — secure defaults for the whole library
+- `<prefix>/<category>.md` — the rules for one category
+- `<prefix>.md` — every category for that version in one file
+
+For example, the line
+
+```
+flask 3.1.3 https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3 injection output-encoding session-management
+```
+
+gives `https://securitycards.rewarelabs.com/downloads/python/flask/3-1-3/output-encoding.md`.
+
+Copy `<prefix>` and each `<category>` from the line exactly, and build URLs only this way — never from memory, a card title, or a guessed filename. The categories on a line are the complete set published for that version; one that is not listed does not exist for it.
+
+Categories are always drawn from this fixed set, lower-case and hyphenated:
+
+`access-control` `api-contract-misuse` `authentication` `boundary-control` `configuration-source-integrity` `cryptography` `csrf` `dangerous-execution` `deserialization` `escape-hatch` `file-handling` `injection` `input-contract-definition` `input-driven-boundary-selection` `input-interpretation-safety` `interface-protocol-hardening` `memory-safety` `network-boundary` `output-encoding` `resource-exhaustion` `runtime-environment-hardening` `secret-handling` `security-control-integrity` `session-management`
 
 ## Fail closed
 
-- Do not follow an HTTP redirect from an unsupported or malformed version to the latest version and then apply that guidance as an exact match.
-- Verify the final response URL and the selected catalog entry before using any card.
-- When the exact version is absent, report the detected version and list the versions present in the live catalog. Stop applying Security Cards guidance for that dependency.
-- Offer guidance for a different version only as clearly labeled, potentially incompatible context and only after the user approves it.
-- When the live catalog or selected card cannot be fetched, do not make claims from the bundled snapshot. Read `references/catalog.json` only to report whether the dependency existed when the skill was packaged, label the snapshot as potentially stale, and state that live security guidance is unavailable.
+- No entry for the resolved version: report that version, list the versions the catalog does have, and stop applying Security Cards to that dependency. Do not fall back to a nearby release.
+- Normalize a version only when the match is unambiguous. A release-tag prefix is not part of the version, so `5.9.0`, `v5.9.0`, and `rel.5.9.0` are one release — but `5.9.1` is a different one.
+- An unsupported or malformed version redirects to the latest supported version of that library. Check the URL you landed on before treating a card as an exact-version match.
+- Cards for a version other than the resolved one are usable only as clearly labeled, possibly incompatible context, and only with the user's agreement.
+- If the site is unreachable, say that live guidance is unavailable. `references/catalog.json` is a snapshot from the day the skill was packaged: use it only to report whether a dependency was supported then, labeled as possibly stale, never as a source of rules.
 
-## Select the narrowest guidance
+## Choose what to read
 
-- **Starting a project:** Fetch the exact version's `blueprintUrl` for every materially used supported library. Establish secure defaults from the blueprints before choosing architecture or writing integration code.
-- **Implementing a feature:** Fetch only the category URLs that cover the feature. Use the exact version's `bundleUrl` only when several categories apply and reading them together is more reliable than individual cards.
-- **Reviewing code:** Fetch the blueprint for overall posture when needed, then fetch category cards matching the reviewed code paths and threat boundaries.
-- Prefer a single category card, then a blueprint, then a library bundle. Do not fetch a language bundle unless the task genuinely spans many libraries.
+- **Starting a project, or adding a library to one:** read `0_security_blueprint.md` for every supported library you will materially use, before choosing an architecture or writing integration code. The blueprint sets the defaults the category cards assume, so read it first even when you already know which category you need.
+- **Building a feature:** the blueprint if you have not read it, then only the categories that cover the feature.
+- **Reviewing code:** the categories matching the code paths and trust boundaries under review.
+- Reach for `<prefix>.md` only when most categories apply at once. A whole-language bundle is almost never the right choice.
 
-## Apply and verify
+## Apply
 
-1. Read every applicable **Use when** and **secure rules** section.
-2. For implementation, apply all relevant secure rules without weakening existing behavior or expanding the user's requested scope.
-3. For review, compare the actual code against every applicable secure rule. Report only findings supported by the code, with the severity, affected code, impact, and a suggested fix.
-4. Re-run relevant tests, static checks, or targeted verification after changes. Do not claim a rule is satisfied unless the relevant code was inspected or tested.
-5. Include the canonical URL of every blueprint or card used. Mention unsupported dependencies and unavailable live guidance separately from confirmed findings.
+Read every **Use when** and **Secure rules** section on the cards you fetched, and apply the rules that match what you are building.
 
-## Completion checklist
+Security rules harden a specification; they do not amend it. Implement the behavior the spec, the API contract, or the user asked for — its status codes, response shapes, units, and edge cases — and add the card's checks around it. Do not turn a rule into a constraint nobody asked for, reject input the spec allows, or widen the change beyond its scope. Where a rule genuinely conflicts with the specification, implement the specification and raise the conflict with the user.
 
-- Read exact resolved dependency versions from the project.
-- Confirm exact matches in the live catalog.
-- Fetch the narrowest applicable live guidance.
-- Apply the secure rules and verify the final code against them.
-- Verify changes or findings against the final code.
-- Cite every canonical Security Cards source used.
+When reviewing rather than writing, report only what the code supports: severity, location, impact, and a fix.
+
+Before finishing:
+
+- Re-run the tests or checks covering what you changed. Do not call a rule satisfied unless you read or exercised the code.
+- Cite the URL of every blueprint and card you used.
+- List unsupported dependencies, and any guidance you could not fetch, separately from your findings.
