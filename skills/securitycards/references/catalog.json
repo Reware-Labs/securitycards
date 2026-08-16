@@ -1333,11 +1333,25 @@
                   "path": "/downloads/go/fiber/v3-4-0/configuration-source-integrity.md"
                 },
                 {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Registering users, verifying login credentials, or issuing session identifiers and API tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/fiber/v3-4-0/cryptography.md",
+                  "path": "/downloads/go/fiber/v3-4-0/cryptography.md"
+                },
+                {
                   "slug": "csrf",
                   "title": "CSRF",
                   "description": "When protecting state-changing routes against cross-site request forgery using Fiber's CSRF middleware and extractors.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/fiber/v3-4-0/csrf.md",
                   "path": "/downloads/go/fiber/v3-4-0/csrf.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "A handler renders a template, or accepts template text, a formula, or another expression from the caller.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/fiber/v3-4-0/dangerous-execution.md",
+                  "path": "/downloads/go/fiber/v3-4-0/dangerous-execution.md"
                 },
                 {
                   "slug": "escape-hatch",
@@ -1485,6 +1499,13 @@
                   "path": "/downloads/go/gin/v1-12-0/authentication.md"
                 },
                 {
+                  "slug": "cryptography",
+                  "title": "Cryptography",
+                  "description": "Registering users, verifying login credentials, or issuing session identifiers and API tokens.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/gin/v1-12-0/cryptography.md",
+                  "path": "/downloads/go/gin/v1-12-0/cryptography.md"
+                },
+                {
                   "slug": "csrf",
                   "title": "CSRF",
                   "description": "Setting session or authentication cookies using `gin.Context` for stateful web applications.",
@@ -1492,11 +1513,25 @@
                   "path": "/downloads/go/gin/v1-12-0/csrf.md"
                 },
                 {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "A handler renders a template, or accepts template text, a formula, or another expression from the caller.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/gin/v1-12-0/dangerous-execution.md",
+                  "path": "/downloads/go/gin/v1-12-0/dangerous-execution.md"
+                },
+                {
                   "slug": "file-handling",
                   "title": "File Handling",
                   "description": "Handling file uploads from multipart forms in Gin handlers and saving them to the local filesystem.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/gin/v1-12-0/file-handling.md",
                   "path": "/downloads/go/gin/v1-12-0/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building a SQL query where any part of the statement comes from a bound struct field, path parameter, or query parameter.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/go/gin/v1-12-0/injection.md",
+                  "path": "/downloads/go/gin/v1-12-0/injection.md"
                 },
                 {
                   "slug": "input-contract-definition",
@@ -5514,150 +5549,150 @@
         {
           "slug": "django",
           "name": "Django",
-          "latestVersion": "6-1rc1",
+          "latestVersion": "6-0-7",
           "versions": [
             {
-              "version": "6.1rc1",
-              "versionSlug": "6-1rc1",
-              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/python/django/6-1rc1/",
-              "path": "/libraries/python/django/6-1rc1/",
-              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1.md",
-              "bundlePath": "/downloads/python/django/6-1rc1.md",
-              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/0_security_blueprint.md",
-              "blueprintPath": "/downloads/python/django/6-1rc1/0_security_blueprint.md",
+              "version": "6.0.7",
+              "versionSlug": "6-0-7",
+              "canonicalUrl": "https://securitycards.rewarelabs.com/libraries/python/django/6-0-7/",
+              "path": "/libraries/python/django/6-0-7/",
+              "bundleUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7.md",
+              "bundlePath": "/downloads/python/django/6-0-7.md",
+              "blueprintUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/0_security_blueprint.md",
+              "blueprintPath": "/downloads/python/django/6-0-7/0_security_blueprint.md",
               "categories": [
                 {
                   "slug": "access-control",
                   "title": "Access Control",
                   "description": "Protecting function-based views or class-based views to ensure only authenticated and authorized users can access specific functionality or resources.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/access-control.md",
-                  "path": "/downloads/python/django/6-1rc1/access-control.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/access-control.md",
+                  "path": "/downloads/python/django/6-0-7/access-control.md"
                 },
                 {
                   "slug": "api-contract-misuse",
                   "title": "API Contract Misuse",
                   "description": "When configuring email messages with blind carbon copy recipients using `EmailMessage`.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/api-contract-misuse.md",
-                  "path": "/downloads/python/django/6-1rc1/api-contract-misuse.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/api-contract-misuse.md",
+                  "path": "/downloads/python/django/6-0-7/api-contract-misuse.md"
                 },
                 {
                   "slug": "authentication",
                   "title": "Authentication",
                   "description": "When handling account recovery tokens, session authentication logins, and user verification workflows.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/authentication.md",
-                  "path": "/downloads/python/django/6-1rc1/authentication.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/authentication.md",
+                  "path": "/downloads/python/django/6-0-7/authentication.md"
                 },
                 {
                   "slug": "boundary-control",
                   "title": "Boundary Control",
                   "description": "Deploying Django behind a reverse proxy to handle secure connection transitions at the server boundary.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/boundary-control.md",
-                  "path": "/downloads/python/django/6-1rc1/boundary-control.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/boundary-control.md",
+                  "path": "/downloads/python/django/6-0-7/boundary-control.md"
                 },
                 {
                   "slug": "cryptography",
                   "title": "Cryptography",
                   "description": "Configuring password storage and handling user credentials securely in Django applications.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/cryptography.md",
-                  "path": "/downloads/python/django/6-1rc1/cryptography.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/cryptography.md",
+                  "path": "/downloads/python/django/6-0-7/cryptography.md"
                 },
                 {
                   "slug": "csrf",
                   "title": "CSRF",
                   "description": "Developing Django web applications that process state-changing requests and require cross-origin or standard form submission protection against cross-site request forgery.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/csrf.md",
-                  "path": "/downloads/python/django/6-1rc1/csrf.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/csrf.md",
+                  "path": "/downloads/python/django/6-0-7/csrf.md"
                 },
                 {
                   "slug": "deserialization",
                   "title": "Deserialization",
                   "description": "When configuring session serialization or handling signed objects and payloads to prevent unsafe arbitrary object construction and remote code execution.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/deserialization.md",
-                  "path": "/downloads/python/django/6-1rc1/deserialization.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/deserialization.md",
+                  "path": "/downloads/python/django/6-0-7/deserialization.md"
                 },
                 {
                   "slug": "file-handling",
                   "title": "File Handling",
                   "description": "When configuring file storage options to prevent user-controlled or colliding filenames from overwriting existing assets or data files.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/file-handling.md",
-                  "path": "/downloads/python/django/6-1rc1/file-handling.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/file-handling.md",
+                  "path": "/downloads/python/django/6-0-7/file-handling.md"
                 },
                 {
                   "slug": "injection",
                   "title": "Injection",
                   "description": "Building database queries with Django QuerySets, raw SQL strings, or expression functions where untrusted user input is involved.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/injection.md",
-                  "path": "/downloads/python/django/6-1rc1/injection.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/injection.md",
+                  "path": "/downloads/python/django/6-0-7/injection.md"
                 },
                 {
                   "slug": "input-contract-definition",
                   "title": "Input Contract Definition",
                   "description": "When defining URL patterns, configuring path converters, implementing custom converters, or handling request host verification.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/input-contract-definition.md",
-                  "path": "/downloads/python/django/6-1rc1/input-contract-definition.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/input-contract-definition.md",
+                  "path": "/downloads/python/django/6-0-7/input-contract-definition.md"
                 },
                 {
                   "slug": "input-interpretation-safety",
                   "title": "Input Interpretation Safety",
                   "description": "Handling user-provided strings, handles, or registration data that require canonical representation and unambiguous interpretation.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/input-interpretation-safety.md",
-                  "path": "/downloads/python/django/6-1rc1/input-interpretation-safety.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/input-interpretation-safety.md",
+                  "path": "/downloads/python/django/6-0-7/input-interpretation-safety.md"
                 },
                 {
                   "slug": "interface-protocol-hardening",
                   "title": "Interface Protocol Hardening",
                   "description": "Configuring transport security, MIME-sniffing protection, referrer policies, and cross-origin isolation headers for web applications.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/interface-protocol-hardening.md",
-                  "path": "/downloads/python/django/6-1rc1/interface-protocol-hardening.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/interface-protocol-hardening.md",
+                  "path": "/downloads/python/django/6-0-7/interface-protocol-hardening.md"
                 },
                 {
                   "slug": "network-boundary",
                   "title": "Network Boundary",
                   "description": "Configuring Django's email backend to send messages securely over SMTP.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/network-boundary.md",
-                  "path": "/downloads/python/django/6-1rc1/network-boundary.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/network-boundary.md",
+                  "path": "/downloads/python/django/6-0-7/network-boundary.md"
                 },
                 {
                   "slug": "output-encoding",
                   "title": "Output Encoding",
                   "description": "When rendering dynamic user input, constructing custom template tags or filters, or embedding data into HTML templates and attributes.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/output-encoding.md",
-                  "path": "/downloads/python/django/6-1rc1/output-encoding.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/output-encoding.md",
+                  "path": "/downloads/python/django/6-0-7/output-encoding.md"
                 },
                 {
                   "slug": "resource-exhaustion",
                   "title": "Resource Exhaustion",
                   "description": "When building forms, formsets, or handling request payloads that process untrusted user input.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/resource-exhaustion.md",
-                  "path": "/downloads/python/django/6-1rc1/resource-exhaustion.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/resource-exhaustion.md",
+                  "path": "/downloads/python/django/6-0-7/resource-exhaustion.md"
                 },
                 {
                   "slug": "runtime-environment-hardening",
                   "title": "Runtime Environment Hardening",
                   "description": "Preparing Django applications for production deployment and configuring runtime settings.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/runtime-environment-hardening.md",
-                  "path": "/downloads/python/django/6-1rc1/runtime-environment-hardening.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/runtime-environment-hardening.md",
+                  "path": "/downloads/python/django/6-0-7/runtime-environment-hardening.md"
                 },
                 {
                   "slug": "secret-handling",
                   "title": "Secret Handling",
                   "description": "Configuring Django settings and application credentials in production or deployment environments.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/secret-handling.md",
-                  "path": "/downloads/python/django/6-1rc1/secret-handling.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/secret-handling.md",
+                  "path": "/downloads/python/django/6-0-7/secret-handling.md"
                 },
                 {
                   "slug": "security-control-integrity",
                   "title": "Security Control Integrity",
                   "description": "Configuring the `MIDDLEWARE` setting in Django applications where security controls depend on state established by upstream middleware.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/security-control-integrity.md",
-                  "path": "/downloads/python/django/6-1rc1/security-control-integrity.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/security-control-integrity.md",
+                  "path": "/downloads/python/django/6-0-7/security-control-integrity.md"
                 },
                 {
                   "slug": "session-management",
                   "title": "Session Management",
                   "description": "Configuring session cookies and production settings to ensure cookies are transmitted securely and protected against interception or client-side extraction.",
-                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-1rc1/session-management.md",
-                  "path": "/downloads/python/django/6-1rc1/session-management.md"
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/django/6-0-7/session-management.md",
+                  "path": "/downloads/python/django/6-0-7/session-management.md"
                 }
               ]
             }
@@ -5707,11 +5742,25 @@
                   "path": "/downloads/python/fastapi/0-139-2/cryptography.md"
                 },
                 {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "A route accepts a formula, filter, rule, or other expression as text and computes a result from it.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/fastapi/0-139-2/dangerous-execution.md",
+                  "path": "/downloads/python/fastapi/0-139-2/dangerous-execution.md"
+                },
+                {
                   "slug": "file-handling",
                   "title": "File Handling",
-                  "description": "You are mounting static directories or asset files in a FastAPI application.",
+                  "description": "Developing FastAPI endpoints that handle multipart file uploads and need to prevent memory exhaustion and file descriptor leaks.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/fastapi/0-139-2/file-handling.md",
                   "path": "/downloads/python/fastapi/0-139-2/file-handling.md"
+                },
+                {
+                  "slug": "injection",
+                  "title": "Injection",
+                  "description": "Building a SQL query where any part of the statement comes from a path parameter, query parameter, header, or request body.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/python/fastapi/0-139-2/injection.md",
+                  "path": "/downloads/python/fastapi/0-139-2/injection.md"
                 },
                 {
                   "slug": "input-contract-definition",
@@ -7550,6 +7599,13 @@
                   "description": "Building web applications, processing form submissions, and configuring state-changing endpoints in Rails controllers or views.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/ruby/rails/v8-1-3/csrf.md",
                   "path": "/downloads/ruby/rails/v8-1-3/csrf.md"
+                },
+                {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "Handling request parameters that could influence code evaluation, method or class resolution, or template rendering.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/ruby/rails/v8-1-3/dangerous-execution.md",
+                  "path": "/downloads/ruby/rails/v8-1-3/dangerous-execution.md"
                 },
                 {
                   "slug": "deserialization",
@@ -9642,6 +9698,13 @@
                   "path": "/downloads/typescript/nest/v11-1-28/cryptography.md"
                 },
                 {
+                  "slug": "dangerous-execution",
+                  "title": "Dangerous Execution",
+                  "description": "A request supplies an expression, formula, filter, or template that a controller, service, or pipe computes a result from.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/nest/v11-1-28/dangerous-execution.md",
+                  "path": "/downloads/typescript/nest/v11-1-28/dangerous-execution.md"
+                },
+                {
                   "slug": "file-handling",
                   "title": "File Handling",
                   "description": "When configuring static asset hosting within a NestJS application using @nestjs/serve-static.",
@@ -9675,6 +9738,13 @@
                   "description": "When bootstrapping a NestJS application and launching the HTTP listener using NestFactory.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/nest/v11-1-28/network-boundary.md",
                   "path": "/downloads/typescript/nest/v11-1-28/network-boundary.md"
+                },
+                {
+                  "slug": "output-encoding",
+                  "title": "Output Encoding",
+                  "description": "Returning request-derived or stored text inside an HTML response body, or rendering a view with values that originated from a client.",
+                  "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/typescript/nest/v11-1-28/output-encoding.md",
+                  "path": "/downloads/typescript/nest/v11-1-28/output-encoding.md"
                 },
                 {
                   "slug": "resource-exhaustion",

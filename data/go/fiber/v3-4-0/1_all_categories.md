@@ -164,6 +164,102 @@ err := app.Listen(":443", fiber.ListenConfig{
 Define explicit precedence for TLS settings and reject unexpected overrides or mixing of conflicting configuration mechanisms in ListenConfig.
 
 
+## Category: cryptography
+
+### Hash passwords slowly and draw tokens from a secure source
+
+**Use when**
+
+Registering users, verifying login credentials, or issuing session identifiers and API tokens.
+
+**Secure rules**
+
+**Rule 1: Store passwords as `bcrypt` or `argon2id` hashes, not plaintext or a fast digest.**
+
+Anyone who obtains the database gets every stored value, and a bare `crypto/sha256` or `crypto/md5` digest barely helps: those are built to be fast, so commodity hardware tests billions of candidates per second. `bcrypt.GenerateFromPassword` applies a work factor and embeds a random salt, and `CompareHashAndPassword` compares in constant time. Bcrypt reads at most 72 bytes and returns `ErrPasswordTooLong` beyond that, so bound the field length; `argon2` suits longer passphrases. `basicauth.New` accepts bcrypt hashes directly, so credentials configured there need no plaintext copy.
+
+```go
+import "golang.org/x/crypto/bcrypt"
+
+func storeUser(db *sql.DB, email, password string) error {
+    hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    if err != nil {
+        return err
+    }
+    _, err = db.Exec(
+        "INSERT INTO users (email, password_hash) VALUES (?, ?)", email, hash,
+    )
+    return err
+}
+
+func checkLogin(storedHash, supplied string) bool {
+    return bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(supplied)) == nil
+}
+```
+
+**Rule 2: Use a keyed hash, not `bcrypt`, when the secret must also serve as a lookup key.**
+
+Rule 1 covers verifying a secret against a row you have already found — by username, by session id. A salted hash is deliberately different every time it is computed, so it cannot be used to *find* that row: an API token or scoping key you have to look the record up by will never match on a second visit. Derive a deterministic value instead with `hmac.New` under a server-side key held outside the database, store that, and look up by it. The key keeps a stolen table from being brute-forced offline the way a bare `sha256` of a short token would be. Compare with `hmac.Equal`.
+
+```go
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+)
+
+// Loaded once at startup from configuration, never stored beside the digests.
+var tokenKey = []byte(os.Getenv("TOKEN_HMAC_KEY"))
+
+func tokenDigest(token string) string {
+    mac := hmac.New(sha256.New, tokenKey)
+    mac.Write([]byte(token))
+    return hex.EncodeToString(mac.Sum(nil))
+}
+
+// Deterministic, so it can be an indexed lookup column.
+func findService(db *sql.DB, token string) (*Service, error) {
+    return queryServiceByDigest(db, tokenDigest(token))
+}
+```
+
+**Rule 3: Generate session tokens and identifiers with `crypto/rand`.**
+
+`math/rand` is deterministic: from a handful of observed outputs its state can be recovered and every later token predicted. Session identifiers, reset codes, and API keys need `crypto/rand`, which reads the operating system's entropy source. Draw at least 16 bytes — 32 for long-lived tokens — and encode the raw bytes rather than reducing them to a short alphabet.
+
+```go
+import (
+    "crypto/rand"
+    "encoding/base64"
+)
+
+func newSessionToken() (string, error) {
+    buf := make([]byte, 32)
+    if _, err := rand.Read(buf); err != nil {
+        return "", err
+    }
+    return base64.RawURLEncoding.EncodeToString(buf), nil
+}
+```
+
+**Rule 4: Compare tokens and signatures in constant time.**
+
+`==` and `bytes.Equal` stop at the first differing byte, so the time taken reveals how much of a guess was right and a remote caller can recover a token byte by byte. Use `subtle.ConstantTimeCompare` for opaque secrets — this is also what a `keyauth.New` validator should use — and `hmac.Equal` for message authentication codes. Hashing both sides to a fixed length first also removes the length leak a raw comparison exposes.
+
+```go
+import (
+    "crypto/sha256"
+    "crypto/subtle"
+)
+
+func tokensMatch(presented, expected string) bool {
+    a := sha256.Sum256([]byte(presented))
+    b := sha256.Sum256([]byte(expected))
+    return subtle.ConstantTimeCompare(a[:], b[:]) == 1
+}
+```
+
+
 ## Category: csrf
 
 ### Configure CSRF Protection and Secure Token Handling in Fiber
@@ -199,6 +295,93 @@ app.Use(csrf.New(csrf.Config{
     SingleUseToken: true,
     IdleTimeout:    15 * time.Minute,
 }))
+```
+
+
+## Category: dangerous execution
+
+### Parse templates from your own files, never from request data
+
+**Use when**
+
+A handler renders a template, or accepts template text, a formula, or another expression from the caller.
+
+**Secure rules**
+
+**Rule 1: Parse templates from your own files and pass request data in only as data.**
+
+`template.New("t").Parse(userInput)` compiles the caller's text into an executable template. Template actions traverse whatever you pass to `Execute` and can call exported methods on it, so a caller controlling the body reads that data. `text/template` also applies no escaping, making its output unsafe in an HTML response. Parse templates once at startup — or register a view engine on `fiber.Config` — and supply untrusted values as the data argument, where `html/template` escapes them per context.
+
+```go
+// Authored by us, parsed once at startup.
+var profileTmpl = template.Must(template.ParseFiles("templates/profile.tmpl"))
+
+app.Get("/profile/:name", func(c fiber.Ctx) error {
+    var buf bytes.Buffer
+    // The caller controls the value, never the template body.
+    if err := profileTmpl.Execute(&buf, map[string]string{"Name": c.Params("name")}); err != nil {
+        return c.SendStatus(fiber.StatusInternalServerError)
+    }
+    c.Set("Content-Type", "text/html; charset=utf-8")
+    return c.Send(buf.Bytes())
+})
+```
+
+**Rule 2: Run external programs without a shell, and keep request data out of the program slot.**
+
+`exec.Command("sh", "-c", cmd)` hands the string to a shell, so `;`, `|`, backticks, and `$(...)` in a request value start further programs. `exec.Command(name, args...)` passes the arguments straight to the kernel with no shell to reinterpret them, so a value containing shell metacharacters stays one literal argument. Keep the program name a constant your code chose — resolving it from the request turns an argument problem into an arbitrary-execution one — and select from a fixed map when the caller must influence which tool runs. Separate arguments from a filename with `--` so a value beginning with `-` cannot be read as a flag.
+
+```go
+// Approved tools, chosen by us. The caller picks a key, never a program name.
+var converters = map[string][]string{
+    "png": {"convert", "-strip"},
+    "jpg": {"convert", "-strip", "-quality", "85"},
+}
+
+app.Post("/convert/:format", func(c fiber.Ctx) error {
+    base, ok := converters[c.Params("format")]
+    if !ok {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "unsupported format"})
+    }
+    // No shell: srcPath stays a single argument whatever it contains.
+    args := append(append([]string{}, base[1:]...), "--", srcPath, dstPath)
+    if err := exec.Command(base[0], args...).Run(); err != nil {
+        return c.SendStatus(fiber.StatusInternalServerError)
+    }
+    return c.SendStatus(fiber.StatusOK)
+})
+```
+
+**Rule 3: Evaluate arithmetic and filter expressions with a parser, not a code evaluator.**
+
+A feature that accepts an expression invites reaching for something that executes it. Go has no `eval`, so the equivalent risk arrives through an embedded interpreter or a plugin loaded with `plugin.Open`: both run caller-supplied logic inside your process, with your file handles and network access. Parse the expression into a tree you walk yourself, permitting only the operators and identifiers the feature needs, and bound the work — depth, node count, input length — so a small expression cannot become an expensive one.
+
+```go
+// Only the operations this endpoint exists to offer.
+var allowedOps = map[string]func(a, b float64) float64{
+    "+": func(a, b float64) float64 { return a + b },
+    "-": func(a, b float64) float64 { return a - b },
+    "*": func(a, b float64) float64 { return a * b },
+}
+
+func evaluate(node Node, depth int) (float64, error) {
+    if depth > 32 {
+        return 0, errors.New("expression too deeply nested")
+    }
+    op, ok := allowedOps[node.Op]
+    if !ok {
+        return 0, fmt.Errorf("unsupported operator")
+    }
+    left, err := evaluate(node.Left, depth+1)
+    if err != nil {
+        return 0, err
+    }
+    right, err := evaluate(node.Right, depth+1)
+    if err != nil {
+        return 0, err
+    }
+    return op(left, right), nil
+}
 ```
 
 
@@ -520,6 +703,99 @@ app.Get("/search-redirect", func(c fiber.Ctx) error {
             "q": url.QueryEscape(query),
         },
     })
+})
+```
+
+### Encode untrusted data for the context the response places it in
+
+**Use when**
+
+Returning text, markup, or stored content that originated from a request, or writing request data into application logs.
+
+**Secure rules**
+
+**Rule 1: Serve stored user content with a non-executable content type.**
+
+Sending a stored value as `text/html` tells the browser to parse the bytes as markup, so a stored `<script>` runs under your origin the next time somebody views it. Setting `text/plain; charset=utf-8` renders the same bytes as text. `X-Content-Type-Options: nosniff` stops the browser sniffing the body into a richer type, and `Content-Disposition: attachment` suits a download rather than a view.
+
+```go
+app.Get("/pages/:slug", func(c fiber.Ctx) error {
+    body := loadSubmittedPage(c.Params("slug")) // user-supplied, untrusted
+
+    c.Set("X-Content-Type-Options", "nosniff")
+    c.Set("Content-Type", "text/plain; charset=utf-8")
+    return c.Send(body)
+})
+```
+
+**Rule 2: Render HTML through `html/template` rather than concatenating strings.**
+
+`html/template` tracks where each value lands — element text, attribute, URL, script block — and applies the escaping that context needs, which `fmt.Sprintf` cannot. Parse templates once at startup and pass untrusted values in as data. `template.HTML`, `template.JS`, and `template.URL` switch escaping off, so reserve them for markup your own code produced. Outside a template, `template.HTMLEscapeString` covers text and quoted-attribute positions.
+
+```go
+// Authored by us, parsed once at startup.
+var greetTmpl = template.Must(template.ParseFiles("templates/greet.tmpl"))
+
+app.Get("/greet", func(c fiber.Ctx) error {
+    var buf bytes.Buffer
+    // html/template escapes name for whichever context the template uses it in.
+    if err := greetTmpl.Execute(&buf, map[string]string{"Name": c.Query("name")}); err != nil {
+        return c.SendStatus(fiber.StatusInternalServerError)
+    }
+    c.Set("Content-Type", "text/html; charset=utf-8")
+    return c.Send(buf.Bytes())
+})
+```
+
+**Rule 3: Sanitize user-authored markup when the response must be `text/html`.**
+
+An endpoint documented as returning `text/html` has to return it, so Rule 1 does not apply — a security rule hardens a specification rather than amending it. Rule 2 does not cover it either: `html/template` escapes values you interpolate into a template you control, not a whole page a user wrote. Run the stored markup through an allowlist sanitizer: `github.com/microcosm-cc/bluemonday` keeps the formatting tags the feature needs and drops `<script>`, `onload`-style handler attributes, and `javascript:` URLs. Where no sanitizer is available, `template.HTMLEscapeString` makes the page inert at the cost of showing its tags as text.
+
+```go
+import "github.com/microcosm-cc/bluemonday"
+
+// Build the policy once at startup, not per request.
+var ugcPolicy = bluemonday.UGCPolicy()
+
+app.Get("/pages/:slug", func(c fiber.Ctx) error {
+    page, ok := loadSubmittedPage(c.Params("slug"))
+    if !ok {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
+    }
+    c.Set("X-Content-Type-Options", "nosniff")
+    c.Set("Content-Type", "text/html; charset=utf-8")
+    // Keeps safe tags, drops scripts and handlers.
+    return c.SendString(ugcPolicy.Sanitize(page))
+})
+```
+
+**Rule 4: Strip newline and control characters before writing request data to a log.**
+
+A value containing `\n` or `\r` splits one log entry into two, letting a caller forge lines that appear to come from the server and push real events out of view. Replace line breaks and other control characters before logging, and cap the length so one request cannot flood the log.
+
+```go
+func sanitizeForLog(value string, limit int) string {
+    cleaned := strings.Map(func(r rune) rune {
+        if r == '\n' || r == '\r' || unicode.IsControl(r) {
+            return ' '
+        }
+        return r
+    }, value)
+    if len(cleaned) > limit {
+        cleaned = cleaned[:limit]
+    }
+    return cleaned
+}
+
+app.Post("/events", func(c fiber.Ctx) error {
+    var req struct {
+        Message string `json:"message"`
+    }
+    if err := c.Bind().JSON(&req); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
+    }
+    log.Printf("client event: %s", sanitizeForLog(req.Message, 200))
+    return c.JSON(fiber.Map{"status": "recorded"})
 })
 ```
 

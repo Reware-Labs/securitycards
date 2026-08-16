@@ -115,3 +115,68 @@ export class FileUploadController {
 **Source files**
 
 - [`sample/29-file-upload/e2e/app/app.e2e-spec.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/29-file-upload/e2e/app/app.e2e-spec.ts)
+
+### Contain Request-Derived Paths Within Their Intended Directory
+
+**Use when**
+
+Building a filesystem path from a route parameter, query value, uploaded filename, or archive entry name.
+
+**Secure rules**
+
+**Rule 1: Resolve the path first, then verify it is still inside the base directory.**
+
+`join()` collapses `..` segments, so a parameter of `../../etc/passwd` produces a path outside the directory the handler intended without any part of the string looking unusual. Rejecting on a substring such as `'..'` is not equivalent: it misses absolute paths and encoded variants while also rejecting legitimate names. Resolve to an absolute path and compare it against the resolved base, keeping the trailing separator in the comparison so that a sibling directory sharing a name prefix does not pass.
+
+```typescript
+import { NotFoundException } from '@nestjs/common';
+import { resolve, sep } from 'path';
+
+const STORAGE_ROOT = resolve(process.cwd(), 'storage');
+
+const resolveWithin = (name: string): string => {
+  const target = resolve(STORAGE_ROOT, name);
+  if (target !== STORAGE_ROOT && !target.startsWith(STORAGE_ROOT + sep)) {
+    throw new NotFoundException();
+  }
+  return target;
+};
+```
+
+**Rule 2: Apply the same containment to every entry read out of an archive.**
+
+Entry names inside a zip or tar are caller-controlled strings that the extraction step turns into paths, so an entry named `../../app/main.js` writes outside the extraction directory and can replace a file the application later executes. Run each entry name through the same resolve-and-verify check before creating anything, and skip entries that are not regular files -- a symbolic link re-introduces the escape after the name itself has been checked.
+
+```typescript
+for (const entry of archive.entries) {
+  if (!entry.isFile()) {
+    continue;
+  }
+  const target = resolveWithin(entry.name);
+  await writeFile(target, await entry.buffer());
+}
+```
+
+**Rule 3: Generate the stored name for an upload instead of trusting the supplied one.**
+
+A multipart filename is chosen by the caller and travels with the request, so reusing it as the stored name carries path separators and leading dots into the filesystem, and lets one upload replace another user's file by reusing its name. Store the file under an identifier the server generates, and keep the original name as metadata when it has to be shown back to the user.
+
+```typescript
+import { randomUUID } from 'crypto';
+import { extname } from 'path';
+
+const storedName = (originalName: string): string => {
+  const extension = extname(originalName).toLowerCase();
+  return /^\.[a-z0-9]{1,8}$/.test(extension)
+    ? `${randomUUID()}${extension}`
+    : randomUUID();
+};
+```
+
+
+**Source files**
+
+- [`sample/29-file-upload/src/app.controller.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/29-file-upload/src/app.controller.ts)
+- [`packages/common/file-stream/streamable-file.ts`](https://github.com/nestjs/nest/blob/v11.1.28/packages/common/file-stream/streamable-file.ts)
+- [`content/techniques/streaming-files.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/streaming-files.md) _(documentation repository)_
+- [`content/techniques/file-upload.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/file-upload.md) _(documentation repository)_

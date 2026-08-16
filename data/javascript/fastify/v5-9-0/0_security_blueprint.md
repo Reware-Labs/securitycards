@@ -22,7 +22,7 @@ Keep authorization hooks and decorators in the same `fastify.register` context a
 
 4. **Protect Credentials, Sessions, and Request Authenticity**
 
-Use maintained Fastify plugins for CSRF protection and secure cookie sessions, with strong keys and production-appropriate cookie settings. Preserve original request bytes when cryptographic webhook verification requires them, and do not treat decorator-based local authentication state as production-ready.
+Use maintained Fastify plugins for CSRF protection and secure cookie sessions, with strong keys and production-appropriate cookie settings. Store passwords as `bcrypt` hashes rather than plaintext or a fast digest, resolve any encryption key once at startup instead of minting one per request, and keep stored secrets out of logs, error bodies, and collection responses. Preserve original request bytes when cryptographic webhook verification requires them, and do not treat decorator-based local authentication state as production-ready.
 
 5. **Bound Payload, Parser, and Connection Work**
 
@@ -34,7 +34,7 @@ Keep supported prototype-poisoning actions at their safe defaults, preferably re
 
 7. **Preserve Response and Output Safety**
 
-Prefer Fastify reply methods and serializers over `reply.raw` or `reply.hijack()`, and fully manage the response after hijacking. Encode redirect targets and header values, set explicit stream media types when required, and never register forbidden trailer fields such as `authorization` or `set-cookie`.
+Prefer Fastify reply methods and serializers over `reply.raw` or `reply.hijack()`, and fully manage the response after hijacking. Encode redirect targets and header values, set explicit stream media types when required, and never register forbidden trailer fields such as `authorization` or `set-cookie`. Escape untrusted values when a route composes an HTML body itself rather than returning serialized JSON, and strip newline and control characters from request data before writing it to a log.
 
 8. **Respect Framework State and Compilation Contracts**
 
@@ -47,3 +47,11 @@ Bind `listen` to only the interfaces that should be reachable, scope `trustProxy
 10. **Fail Closed in Custom Validation and Routing**
 
 Propagate every custom constraint derivation error to its callback so routing cannot fall through to another handler. When `attachValidation` is enabled, explicitly inspect and handle validation failures, throw real `Error` instances from custom error handlers, and fully reconstruct schemas before recompiling modified validation rules.
+
+11. **Confine File Paths and Archive Members**
+
+Resolve any request-supplied file name or path segment against a fixed storage root and confirm the result stays inside it before opening, since joining a raw value still leaves the root when it contains `..`. Apply the same containment check to every entry read out of an uploaded archive, and reject rather than clamp so a traversal attempt does not silently reach a neighbouring file.
+
+12. **Keep Untrusted Input Out of Shells and Evaluators**
+
+Invoke external programs with `execFile` or `spawn` and an argument array rather than a concatenated `exec` string, leave `shell` disabled, and reject argument values beginning with a dash so they cannot be read as options. Never pass request data to `eval`, `new Function`, or `node:vm`; parse submitted expressions with a restricted grammar and bound the length and nesting depth they may reach.

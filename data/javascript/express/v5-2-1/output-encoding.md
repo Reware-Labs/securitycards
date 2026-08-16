@@ -29,3 +29,54 @@ app.get('/api/data', (req, res) => {
   res.jsonp({ userContent: '<script>alert(1)</script>' });
 });
 ```
+
+
+### Serve stored user content without letting it execute
+
+**Use when**
+
+Returning text, markup, or stored file content that originated from a request — a profile page, a comment, a description.
+
+**Secure rules**
+
+**Rule 1: Serve stored user content with a non-executable content type where the contract allows.**
+
+`res.send(html)` and `res.type('html')` tell the browser to parse the body as markup, so stored `<script>` runs under your origin the next time somebody views it. Where the endpoint is not documented as returning HTML, `res.json()` or `res.type('text/plain')` renders the same bytes as text. Add `X-Content-Type-Options: nosniff` so the browser does not sniff the body into a richer type, and `Content-Disposition: attachment` where a download rather than a view is intended.
+
+```javascript
+app.get('/pages/:slug', (req, res) => {
+  const body = loadSubmittedPage(req.params.slug); // user-supplied, untrusted
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.type('text/plain; charset=utf-8').send(body);
+});
+```
+
+**Rule 2: Sanitize user-authored markup when the response must be `text/html`.**
+
+An endpoint documented as returning `text/html` has to return it, so Rule 1 does not apply — a security rule hardens a specification rather than amending it. Run the stored markup through an allowlist sanitizer: `sanitize-html` keeps the formatting tags the feature needs and drops `<script>`, `onload`-style handler attributes, and `javascript:` URLs. Where no sanitizer is available, escaping the page makes it inert at the cost of showing its tags as text.
+
+```javascript
+const sanitizeHtml = require('sanitize-html');
+
+app.get('/pages/:slug', (req, res) => {
+  const body = loadSubmittedPage(req.params.slug);
+  if (body === undefined) return res.status(404).json({ message: 'Not found' });
+  res.set('X-Content-Type-Options', 'nosniff');
+  // Keeps safe tags, drops scripts and handlers.
+  res.type('text/html; charset=utf-8').send(sanitizeHtml(body));
+});
+```
+
+**Rule 3: Strip newline and control characters before writing request data to a log.**
+
+A value containing `\n` or `\r` splits one log entry into two, letting a caller forge lines that look like the server wrote them and push real events out of view. Replace line breaks and other control characters before logging, and cap the length so one request cannot flood the log.
+
+```javascript
+const sanitizeForLog = (value, limit = 200) =>
+  String(value).replace(/[\u0000-\u001F\u007F]/g, ' ').slice(0, limit);
+
+app.post('/events', (req, res) => {
+  console.log('client event: %s', sanitizeForLog(req.body.message));
+  res.json({ status: 'recorded' });
+});
+```

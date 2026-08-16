@@ -29,6 +29,72 @@ func AuthMiddleware() gin.HandlerFunc {
 ```
 
 
+### Take the acting identity from the verified credential
+
+**Use when**
+
+A handler reads or modifies data belonging to a specific user and the request also carries a username, account id, or email.
+
+**Secure rules**
+
+**Rule 1: Read the subject from the context value the middleware set, not the payload.**
+
+An identifier in the request says who the caller *claims* to be; only the verified token says who they are. Binding `owner` from the body lets any authenticated caller reach anyone else's data by editing one field. Store the verified subject with `c.Set`, read it with `c.Get`, and key every lookup on it. Where the contract carries the identifier too, compare and reject with `403`.
+
+```go
+func AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        username, err := verifyToken(c.GetHeader("Authorization"))
+        if err != nil {
+            c.AbortWithStatus(http.StatusUnauthorized)
+            return
+        }
+        c.Set("currentUser", username) // the only trusted source of identity
+        c.Next()
+    }
+}
+
+func registerNotes(router *gin.Engine) {
+    router.POST("/notes", func(c *gin.Context) {
+        var req struct {
+            Owner string `json:"owner" binding:"required"`
+            Body  string `json:"body" binding:"required"`
+        }
+        if err := c.ShouldBindJSON(&req); err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+            return
+        }
+        currentUser := c.GetString("currentUser")
+        if req.Owner != currentUser {
+            c.AbortWithStatusJSON(http.StatusForbidden,
+                gin.H{"error": "cannot act on behalf of another user"})
+            return
+        }
+        saveNote(currentUser, req.Body) // keyed by the verified identity
+        c.JSON(http.StatusOK, gin.H{"status": "created"})
+    })
+}
+```
+
+**Rule 2: Register the authorization middleware on a route group.**
+
+Authorization applied handler by handler is only as complete as the last route somebody added, and a `GET` filtered by a query parameter is as exploitable as an unguarded `POST`. A `router.Group` makes every route inherit it, so protection is the default. Scope the query by the authenticated subject as well, and prefer `404` over `403` where the record's existence is sensitive.
+
+```go
+router := gin.Default()
+
+authorized := router.Group("/", AuthMiddleware()) // applies to every route below
+authorized.GET("/notes", func(c *gin.Context) {
+    records, ok := loadNotes(c.GetString("currentUser")) // scoped, not filtered after
+    if !ok {
+        c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"notes": records})
+})
+```
+
+
 ## Category: api contract misuse
 
 ### Validate HTTP status codes before invoking redirect renderers
@@ -84,6 +150,76 @@ authorized.GET("/dashboard", func(c *gin.Context) {
 ```
 
 
+## Category: cryptography
+
+### Hash passwords slowly and draw tokens from a secure source
+
+**Use when**
+
+Registering users, verifying login credentials, or issuing session identifiers and API tokens.
+
+**Secure rules**
+
+**Rule 1: Store passwords as `bcrypt` or `argon2id` hashes, not plaintext or a fast digest.**
+
+Anyone who obtains the database gets every stored value, and a bare `crypto/sha256` or `crypto/md5` digest barely helps: those are built to be fast, so commodity hardware tests billions of candidates per second. `bcrypt.GenerateFromPassword` applies a work factor and embeds a random salt, and `CompareHashAndPassword` compares in constant time. Bcrypt reads at most 72 bytes and returns `ErrPasswordTooLong` beyond that, so bound the field length; `argon2` suits longer passphrases.
+
+```go
+import "golang.org/x/crypto/bcrypt"
+
+func storeUser(db *sql.DB, email, password string) error {
+    hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    if err != nil {
+        return err
+    }
+    _, err = db.Exec(
+        "INSERT INTO users (email, password_hash) VALUES (?, ?)", email, hash,
+    )
+    return err
+}
+
+func checkLogin(storedHash, supplied string) bool {
+    return bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(supplied)) == nil
+}
+```
+
+**Rule 2: Generate session tokens and identifiers with `crypto/rand`.**
+
+`math/rand` is deterministic: from a handful of observed outputs its state can be recovered and every later token predicted. Session identifiers, reset codes, and API keys need `crypto/rand`, which reads the operating system's entropy source. Draw at least 16 bytes — 32 for long-lived tokens — and encode the raw bytes rather than reducing them to a short alphabet.
+
+```go
+import (
+    "crypto/rand"
+    "encoding/base64"
+)
+
+func newSessionToken() (string, error) {
+    buf := make([]byte, 32)
+    if _, err := rand.Read(buf); err != nil {
+        return "", err
+    }
+    return base64.RawURLEncoding.EncodeToString(buf), nil
+}
+```
+
+**Rule 3: Compare tokens and signatures in constant time.**
+
+`==` and `bytes.Equal` stop at the first differing byte, so the time taken reveals how much of a guess was right and a remote caller can recover a token byte by byte. Use `subtle.ConstantTimeCompare` for opaque secrets and `hmac.Equal` for message authentication codes. Hashing both sides to a fixed length first also removes the length leak a raw comparison exposes.
+
+```go
+import (
+    "crypto/sha256"
+    "crypto/subtle"
+)
+
+func tokensMatch(presented, expected string) bool {
+    a := sha256.Sum256([]byte(presented))
+    b := sha256.Sum256([]byte(expected))
+    return subtle.ConstantTimeCompare(a[:], b[:]) == 1
+}
+```
+
+
 ## Category: csrf
 
 ### Configure SameSite Cookie Attributes to Prevent Cross-Site Request Forgery
@@ -101,6 +237,31 @@ To mitigate cross-site request forgery attacks, ensure session and authenticatio
 ```go
 c.SetSameSite(http.SameSiteLaxMode)
 c.SetCookie("session_id", token, 3600, "/", "", true, true)
+```
+
+
+## Category: dangerous execution
+
+### Parse templates from your own files, never from request data
+
+**Use when**
+
+A handler renders a template, or accepts template text, a formula, or another expression from the caller.
+
+**Secure rules**
+
+**Rule 1: Parse templates from your own files and pass request data in only as data.**
+
+`template.New("t").Parse(userInput)` compiles the caller's text into an executable template. Template actions traverse whatever you pass to `Execute` and can call exported methods on it, so a caller controlling the body reads that data. `text/template` also applies no escaping, making its output unsafe in an HTML response. Load templates once at startup with `router.LoadHTMLGlob` and let `c.HTML` supply untrusted values as the data argument, where `html/template` escapes them per context.
+
+```go
+router := gin.Default()
+router.LoadHTMLGlob("templates/*.tmpl") // authored by us, parsed once at startup
+
+router.GET("/profile/:name", func(c *gin.Context) {
+    // The caller controls the value, never the template body.
+    c.HTML(http.StatusOK, "profile.tmpl", gin.H{"name": c.Param("name")})
+})
 ```
 
 
@@ -131,6 +292,19 @@ return
 }
 dst := filepath.Join("/safe/upload/dir", filename)
 c.SaveUploadedFile(file, dst)
+```
+
+**Rule 2: Read text fields as text, not as uploaded files**
+
+A multipart request can contain both ordinary fields and files. Use `c.PostForm` or `c.GetPostForm` for text fields and reserve `c.FormFile` for actual file parts; treating a text field as a file rejects valid requests.
+
+```go
+page, ok := c.GetPostForm("profile_page")
+if !ok {
+    c.String(http.StatusBadRequest, "Missing profile page")
+    return
+}
+photo, err := c.FormFile("profile_photo")
 ```
 
 
@@ -184,6 +358,167 @@ Ensure directory listing is explicitly disabled to prevent exposing directory in
 router := gin.Default()
 router.Static("/public", "./public")
 router.StaticFS("/assets", gin.Dir("./assets", false))
+```
+
+
+### Contain archive members inside the extraction directory
+
+**Use when**
+
+Unpacking a zip or tar archive that arrived as an upload or from a caller-supplied location.
+
+**Secure rules**
+
+**Rule 1: Confirm each member's destination stays inside the extraction root.**
+
+Archive entries carry their own path and neither `archive/zip` nor `archive/tar` sanitizes it, so a member named `../../etc/cron.d/job` writes exactly there. `filepath.IsLocal` rejects absolute paths, `..` components, and reserved Windows names in one call, and joining a local name to the root cannot leave it. Skip entries that are not regular files, so no symlink redirects later reads.
+
+```go
+func extractMember(root string, f *zip.File) error {
+    if !filepath.IsLocal(f.Name) {
+        return fmt.Errorf("unsafe archive entry: %s", f.Name)
+    }
+    if !f.FileInfo().Mode().IsRegular() {
+        return nil // skip directories, symlinks, devices
+    }
+    dst := filepath.Join(root, f.Name)
+    if err := os.MkdirAll(filepath.Dir(dst), 0o750); err != nil {
+        return err
+    }
+    src, err := f.Open()
+    if err != nil {
+        return err
+    }
+    defer src.Close()
+
+    out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o640)
+    if err != nil {
+        return err
+    }
+    defer out.Close()
+
+    _, err = io.Copy(out, src)
+    return err
+}
+```
+
+
+## Category: injection
+
+### Bind untrusted values into SQL statements as placeholders
+
+**Use when**
+
+Building a SQL query where any part of the statement comes from a bound struct field, path parameter, or query parameter.
+
+**Secure rules**
+
+**Rule 1: Pass request values as placeholder arguments, never as query text.**
+
+Gin's binders check that a field is present and well typed, but a validated `string` is still arbitrary text. Building the statement with `fmt.Sprintf` or `+` lets a value such as `admin'--` change what it means. Give the query placeholders — `?` for MySQL and SQLite, `$1` for PostgreSQL — and pass the values as trailing arguments. Placeholders bind values only, not table or column names.
+
+```go
+type LoginRequest struct {
+    Email string `json:"email" binding:"required,email"`
+}
+
+router.POST("/login", func(c *gin.Context) {
+    var req LoginRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+        return
+    }
+    var id int
+    var hash string
+    err := db.QueryRow(
+        "SELECT id, password_hash FROM users WHERE email = ?", req.Email,
+    ).Scan(&id, &hash)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"id": id})
+})
+```
+
+**Rule 2: Map identifiers through a lookup defined in code when a placeholder cannot be used.**
+
+Column names and sort directions are part of the statement's syntax, so the driver will not bind them. Translate the request value through a map or a `binding:"oneof=..."` tag and interpolate the resulting constant, which holds no caller-controlled text. Quoting or escaping the raw value instead is fragile and varies by database.
+
+```go
+var sortColumns = map[string]string{"name": "name", "created": "created_at"}
+
+type ListQuery struct {
+    SortBy string `form:"sort_by" binding:"omitempty,oneof=name created"`
+}
+
+router.GET("/products", func(c *gin.Context) {
+    var q ListQuery
+    if err := c.ShouldBindQuery(&q); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid sort"})
+        return
+    }
+    column, ok := sortColumns[q.SortBy]
+    if !ok {
+        column = "name"
+    }
+    rows, err := db.Query(
+        fmt.Sprintf("SELECT id, name FROM products ORDER BY %s LIMIT ?", column), 100,
+    )
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "query failed"})
+        return
+    }
+    defer rows.Close()
+    // ... scan rows
+})
+```
+
+
+### Invoke external programs as argument slices without a shell
+
+**Use when**
+
+Running an external tool where any argument comes from request data, such as a filename, URL, or hostname.
+
+**Secure rules**
+
+**Rule 1: Build commands with `exec.Command(name, args...)`, not a shell string.**
+
+`exec.Command` executes the named binary directly, so `;`, `|`, backticks, and `$(...)` inside an argument are ordinary characters. Routing the same work through `exec.Command("sh", "-c", line)` reintroduces the interpreter, and a filename such as `report.pdf; rm -rf /var/data` then runs a second command. Where a pipeline is genuinely needed, connect two `exec.Cmd` values through `StdoutPipe`.
+
+```go
+router.POST("/convert", func(c *gin.Context) {
+    source := c.PostForm("source")
+    target := c.PostForm("target")
+
+    cmd := exec.Command("convert", source, target) // separate arguments
+    if err := cmd.Run(); err != nil {
+        c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "conversion failed"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"output": target})
+})
+```
+
+**Rule 2: Stop request-derived arguments from being read as options.**
+
+Without a shell there is still the program's own flag parser: an argument beginning with `-` becomes an option and can redirect output or enable an unintended mode. Rejecting leading dashes is the guard that always works, so make that the check you rely on. `--` is a widely followed convention rather than a guaranteed one: `getopt`-based tools honour it, but `g++` and `gcc` reject it outright with `unrecognized command-line option '--'`, so adding it to a compiler invocation breaks a command that was working. Pass `--` only to a program documented to accept it, and keep your own flags ahead of it, since many tools are order-sensitive.
+
+```go
+router.GET("/reachability", func(c *gin.Context) {
+    host := c.Query("host")
+    if strings.HasPrefix(host, "-") {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid host"})
+        return
+    }
+    cmd := exec.Command("ping", "-c", "1", "--", host) // our flags, then user data
+    if err := cmd.Run(); err != nil {
+        c.JSON(http.StatusOK, gin.H{"reachable": false})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"reachable": true})
+})
 ```
 
 
@@ -346,6 +681,121 @@ c.JSON(http.StatusOK, gin.H{
 ```
 
 
+### Encode untrusted data for the context the response places it in
+
+**Use when**
+
+Returning text, markup, or stored content that originated from a request, or writing request data into application logs.
+
+**Secure rules**
+
+**Rule 1: Serve stored user content with a non-executable content type.**
+
+`c.Data(200, "text/html", body)` tells the browser to parse the bytes as markup, so stored `<script>` runs under your origin the next time somebody views it. `c.String`, `c.JSON`, or `c.Data` with `text/plain; charset=utf-8` render the same bytes as text. `X-Content-Type-Options: nosniff` stops the browser sniffing the body into a richer type, and `Content-Disposition: attachment` suits a download rather than a view.
+
+```go
+router.GET("/pages/:slug", func(c *gin.Context) {
+    body := loadSubmittedPage(c.Param("slug")) // user-supplied, untrusted
+
+    c.Header("X-Content-Type-Options", "nosniff")
+    c.Data(http.StatusOK, "text/plain; charset=utf-8", body)
+})
+```
+
+**Rule 2: Render HTML through `html/template` rather than concatenating strings.**
+
+`html/template` tracks where each value lands — element text, attribute, URL, script block — and applies the escaping that context needs, which `fmt.Sprintf` cannot. Register templates with `LoadHTMLGlob` and render with `c.HTML`, passing untrusted values as data. `template.HTML`, `template.JS`, and `template.URL` switch escaping off, so reserve them for markup your own code produced. Outside a template, `template.HTMLEscapeString` covers text and quoted-attribute positions.
+
+```go
+router := gin.Default()
+router.LoadHTMLGlob("templates/*.tmpl")
+
+router.GET("/greet", func(c *gin.Context) {
+    // html/template escapes name for whichever context the template uses it in.
+    c.HTML(http.StatusOK, "greet.tmpl", gin.H{"name": c.Query("name")})
+})
+```
+
+**Rule 3: Sanitize user-authored markup when the response must be `text/html`.**
+
+An endpoint documented as returning `text/html` has to return it, so Rule 1 does not apply — a security rule hardens a specification rather than amending it. Rule 2 does not cover it either: `html/template` escapes values you interpolate into a template you control, not a whole page a user wrote. Run the stored markup through an allowlist sanitizer: `github.com/microcosm-cc/bluemonday` keeps the formatting tags the feature needs and drops `<script>`, `onload`-style handler attributes, and `javascript:` URLs. Where no sanitizer is available, `template.HTMLEscapeString` makes the page inert at the cost of showing its tags as text.
+
+```go
+import "github.com/microcosm-cc/bluemonday"
+
+// Build the policy once at startup, not per request.
+var ugcPolicy = bluemonday.UGCPolicy()
+
+func registerPages(router *gin.Engine) {
+    router.GET("/pages/:slug", func(c *gin.Context) {
+        page, ok := loadSubmittedPage(c.Param("slug"))
+        if !ok {
+            c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+            return
+        }
+        c.Header("X-Content-Type-Options", "nosniff")
+        // Keeps safe tags, drops scripts and handlers.
+        c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(ugcPolicy.Sanitize(page)))
+    })
+}
+```
+
+**Rule 4: Serve a stored upload under an allowlisted content type, never the type sniffed from its bytes.**
+
+Rules 1 to 3 govern a body you decided was markup; this one governs the case where the *content type itself* comes from the upload. `http.DetectContentType` on an attacker's file returns whatever that file looks like, so a `.html` upload comes back as `text/html` and echoing that type re-serves the attacker's script under your origin — the sniff is what makes it executable, even though the handler only ever meant to serve images. Match the detected or client-supplied type against the fixed set the endpoint exists to return and serve anything else as `application/octet-stream`. That keeps a genuine image on its real mimetype, so a documented "returns the image's content type" contract still holds. Treat `image/svg+xml` as markup rather than an image, because an SVG can carry script. Send `X-Content-Type-Options: nosniff` so the browser does not re-sniff past the type you chose.
+
+```go
+// The types this endpoint exists to serve. Anything else is a download.
+var servableImageTypes = map[string]bool{
+    "image/png": true, "image/jpeg": true, "image/gif": true, "image/webp": true,
+}
+
+func serveImage(c *gin.Context, body []byte, storedType string) {
+    contentType := "application/octet-stream" // fail closed
+    if servableImageTypes[strings.ToLower(strings.TrimSpace(storedType))] {
+        contentType = storedType
+    }
+
+    c.Header("X-Content-Type-Options", "nosniff")
+    c.Header("Content-Disposition", "inline")
+    c.Data(http.StatusOK, contentType, body)
+}
+```
+
+**Rule 5: Strip newline and control characters before writing request data to a log.**
+
+A value containing `\n` or `\r` splits one log entry into two, letting a caller forge lines that appear to come from the server and push real events out of view. Replace line breaks and other control characters before logging, and cap the length so one request cannot flood the log.
+
+```go
+func sanitizeForLog(value string, limit int) string {
+    cleaned := strings.Map(func(r rune) rune {
+        if r == '\n' || r == '\r' || unicode.IsControl(r) {
+            return ' '
+        }
+        return r
+    }, value)
+    if len(cleaned) > limit {
+        cleaned = cleaned[:limit]
+    }
+    return cleaned
+}
+
+func registerEvents(router *gin.Engine) {
+    router.POST("/events", func(c *gin.Context) {
+        var req struct {
+            Message string `json:"message" binding:"required"`
+        }
+        if err := c.ShouldBindJSON(&req); err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+            return
+        }
+        log.Printf("client event: %s", sanitizeForLog(req.Message, 200))
+        c.JSON(http.StatusOK, gin.H{"status": "recorded"})
+    })
+}
+```
+
+
 ## Category: resource exhaustion
 
 ### Limit Multipart Upload Memory Allocation
@@ -363,6 +813,135 @@ Explicitly set `router.MaxMultipartMemory` to an appropriate size limit to preve
 ```go
 router := gin.Default()
 router.MaxMultipartMemory = 8 << 20 // Limit memory buffer to 8 MiB
+```
+
+
+### Bound request bodies and connection lifetimes at the server
+
+**Use when**
+
+Starting a Gin server and accepting request bodies of any kind.
+
+**Secure rules**
+
+**Rule 1: Cap request body reads with `http.MaxBytesReader`.**
+
+`MaxMultipartMemory` only governs how much of a multipart form is buffered in RAM before the rest spills to temporary files; it caps neither the request overall nor JSON and raw bodies. Wrapping `c.Request.Body` before binding makes the read fail past the limit, so an unbounded upload is rejected instead of filling memory or disk. Applying it as middleware covers routes added later.
+
+```go
+func BodyLimit(maxBytes int64) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxBytes)
+        c.Next()
+    }
+}
+
+func main() {
+    router := gin.Default()
+    router.Use(BodyLimit(10 << 20)) // 10 MiB per request
+}
+```
+
+**Rule 2: Set explicit timeouts on the `http.Server` rather than using `router.Run`.**
+
+`router.Run` calls `http.ListenAndServe`, which leaves `ReadTimeout`, `WriteTimeout`, and `IdleTimeout` at zero — meaning no timeout at all. A client sending headers one byte at a time then holds file descriptors and goroutines indefinitely. Construct the `http.Server` yourself so slow and idle peers are disconnected; `ReadHeaderTimeout` bounds the header phase specifically.
+
+```go
+srv := &http.Server{
+    Addr:              ":8080",
+    Handler:           router,
+    ReadHeaderTimeout: 5 * time.Second,
+    ReadTimeout:       15 * time.Second,
+    WriteTimeout:      30 * time.Second,
+    IdleTimeout:       60 * time.Second,
+}
+if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+    log.Fatal(err)
+}
+```
+
+
+### Bound work whose cost the caller controls
+
+**Use when**
+
+Running pattern matching, spawning an external process, or decompressing an archive using data from the request.
+
+**Secure rules**
+
+**Rule 1: Keep request-supplied patterns out of `regexp`, and cap the text they match against.**
+
+Go's `regexp` implements RE2, which runs linear in the input and so avoids the exponential backtracking `(a+)+` causes elsewhere — useful, but not a complete defence, since cost stays linear in the product of pattern and subject size. Compile patterns once at startup, treat a caller-supplied needle as a literal with `regexp.QuoteMeta` or `strings.Contains`, and bound the subject length.
+
+```go
+const maxSubject = 1 << 20 // 1 MiB
+
+router.GET("/search", func(c *gin.Context) {
+    needle := c.Query("needle")
+    haystack := loadDocument(c.Query("doc"))
+    if len(haystack) > maxSubject {
+        c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "content too large"})
+        return
+    }
+    // The caller supplies text to find, not a pattern to compile.
+    re := regexp.MustCompile(regexp.QuoteMeta(needle))
+    c.JSON(http.StatusOK, gin.H{"matches": re.FindAllStringIndex(haystack, 100)})
+})
+```
+
+**Rule 2: Give every external process a deadline with `exec.CommandContext`.**
+
+`cmd.Run` waits as long as the child runs, so an input that makes a converter or decoder loop holds the goroutine, its pipes, and its file descriptors indefinitely. Deriving the command from a `context.WithTimeout` kills the process at the deadline, and checking `ctx.Err()` afterwards tells a timeout apart from an ordinary failure. `cmd.WaitDelay` additionally bounds how long `Wait` blocks when the child leaves an inherited pipe open after being signalled.
+
+```go
+router.POST("/thumbnails", func(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(c.Request.Context(), 15*time.Second)
+    defer cancel()
+
+    cmd := exec.CommandContext(ctx, "convert", source, "-resize", "128x128", target)
+    cmd.WaitDelay = 2 * time.Second
+    err := cmd.Run()
+    if ctx.Err() == context.DeadlineExceeded {
+        c.JSON(http.StatusGatewayTimeout, gin.H{"error": "conversion timed out"})
+        return
+    }
+    if err != nil {
+        c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "conversion failed"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"output": target})
+})
+```
+
+**Rule 3: Limit how many bytes an archive may expand to.**
+
+Compression ratios above 1000:1 are easy to construct, so a few kilobytes of upload can expand into gigabytes and exhaust memory or disk. Copy each member through an `io.LimitReader` and track a running total, which enforces the limit on the bytes actually produced. `zip.File.UncompressedSize64` is a useful pre-check but is read from the archive itself and can be falsified.
+
+```go
+const maxTotalBytes = 50 << 20 // 50 MiB
+
+func extractBounded(r *zip.ReadCloser, dst io.Writer) error {
+    var written int64
+    for _, f := range r.File {
+        if f.FileInfo().IsDir() {
+            continue
+        }
+        rc, err := f.Open()
+        if err != nil {
+            return err
+        }
+        n, err := io.Copy(dst, io.LimitReader(rc, maxTotalBytes-written))
+        rc.Close()
+        if err != nil {
+            return err
+        }
+        written += n
+        if written >= maxTotalBytes {
+            return errors.New("archive expands beyond the allowed size")
+        }
+    }
+    return nil
+}
 ```
 
 
@@ -420,6 +999,71 @@ router.Use(gin.CustomRecovery(func(c *gin.Context, err any) {
     log.Printf("[Recovery] Panic caught on %s %s: %v", c.Request.Method, c.Request.URL.Path, err)
     c.AbortWithStatus(http.StatusInternalServerError)
 }))
+```
+
+
+### Keep credentials out of source and store user secrets encrypted
+
+**Use when**
+
+Configuring credentials for a Gin application, or persisting secret values that users submit.
+
+**Secure rules**
+
+**Rule 1: Load credentials from the environment, and reserve `gin.BasicAuth` for fixed operator accounts.**
+
+`gin.BasicAuth(gin.Accounts{...})` holds every password in cleartext, and writing that map as a literal commits credentials to source control and to every image built from it. Read the values from the environment for the few fixed accounts this middleware suits. For accounts end users register it is the wrong shape: authenticate against a stored password hash so no reversible credential exists on the server.
+
+```go
+router := gin.Default()
+
+// A fixed operator account, credential supplied at deploy time.
+admin := router.Group("/internal", gin.BasicAuth(gin.Accounts{
+    os.Getenv("ADMIN_USER"): os.Getenv("ADMIN_PASSWORD"),
+}))
+admin.GET("/metrics", metricsHandler)
+
+// End-user accounts authenticate against a stored hash, not this map.
+router.POST("/login", loginWithPasswordHash)
+```
+
+**Rule 2: Encrypt recoverable secrets before writing them to storage.**
+
+Some values have to be readable again — a stored API key, a token replayed to a third party — so hashing is not an option. Encrypt with an authenticated cipher and store only the ciphertext; AES-GCM also detects tampering, given a nonce never repeated under one key, which a fresh `crypto/rand` draw per message provides.
+
+Resolve the key **once at startup**, never inside the handler, and never generate a random one as a fallback: it differs on each restart and across workers, so everything already stored becomes permanently unreadable — silent data loss that surfaces as a decrypt or authentication error. Where no dedicated key is configured, derive one deterministically from the application secret you already have.
+
+```go
+// Resolved once at startup, never per request.
+var vaultKey = loadVaultKey()
+
+func loadVaultKey() []byte {
+    if raw := os.Getenv("VAULT_ENCRYPTION_KEY"); raw != "" {
+        if key, err := base64.StdEncoding.DecodeString(raw); err == nil {
+            return key
+        }
+    }
+    // Deterministic derivation: stable across restarts and across workers.
+    sum := sha256.Sum256([]byte("vault-encryption|" + os.Getenv("APP_SECRET")))
+    return sum[:]
+}
+
+func encryptSecret(plaintext []byte) ([]byte, error) {
+    block, err := aes.NewCipher(vaultKey) // 32 bytes for AES-256
+    if err != nil {
+        return nil, err
+    }
+    gcm, err := cipher.NewGCM(block)
+    if err != nil {
+        return nil, err
+    }
+    nonce := make([]byte, gcm.NonceSize())
+    if _, err := rand.Read(nonce); err != nil {
+        return nil, err
+    }
+    // Nonce is prefixed to the ciphertext so decryption can recover it.
+    return gcm.Seal(nonce, nonce, plaintext, nil), nil
+}
 ```
 
 

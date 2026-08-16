@@ -252,6 +252,38 @@ await fastify.listen({ port: 443 });
 ```
 
 
+### Store credentials as verifier hashes
+
+**Use when**
+
+Persisting a user password, or comparing a submitted credential against a stored one.
+
+**Secure rules**
+
+**Rule 1: Hash passwords with a slow, salted algorithm and never persist the plaintext.**
+
+`bcrypt` applies a per-password salt and a tunable cost factor, so a stolen table cannot be reversed with a precomputed lookup. Hash on registration, verify with `bcrypt.compare`, and never store, log, or return the original value. A fast digest such as SHA-256 is not a password hash: it is cheap enough to brute-force offline.
+
+```javascript
+const bcrypt = require('bcrypt');
+
+fastify.post('/register', async (request, reply) => {
+  const { email, password } = request.body;
+  const passwordHash = await bcrypt.hash(password, 12);
+  await createUser(email, passwordHash); // the plaintext is never persisted
+  return reply.code(201).send({ email });
+});
+
+fastify.post('/login', async (request, reply) => {
+  const user = await findUser(request.body.email);
+  const valid = user && (await bcrypt.compare(request.body.password, user.passwordHash));
+  if (!valid) {
+    return reply.code(401).send({ error: 'invalid credentials' });
+  }
+  return { token: issueToken(user) };
+});
+```
+
 **Source files**
 
 - [`docs/Guides/Serverless.md`](https://github.com/fastify/fastify/blob/v5.9.0/docs/Guides/Serverless.md)
@@ -307,6 +339,46 @@ const bodySchema = {
 fastify.post('/register', { schema: { body: bodySchema } }, handler);
 ```
 
+
+### Evaluate submitted expressions with a parser, not the JavaScript engine
+
+**Use when**
+
+A request supplies an expression, formula, or template that the application computes a result from.
+
+**Secure rules**
+
+**Rule 1: Never pass request data to `eval`, `new Function`, or `node:vm`.**
+
+Each of these compiles its input as JavaScript with the process's full authority, so an endpoint that evaluates arithmetic also runs `require('node:child_process')`. `node:vm` is a sandbox for isolating trusted code, not a security boundary against hostile input, and its context is escapable. Parse the input with a grammar that accepts only the operators the feature needs and evaluate the resulting tree yourself.
+
+```javascript
+// Only digits, the four operators, parentheses, and spaces reach the parser.
+const ARITHMETIC = /^[0-9+\-*/(). ]{1,100}$/;
+
+fastify.post('/calculate', async (request, reply) => {
+  const { expression } = request.body;
+  if (!ARITHMETIC.test(expression)) {
+    return reply.code(400).send({ error: 'unsupported expression' });
+  }
+  return { result: evaluateArithmetic(expression) }; // own parser, never eval
+});
+```
+
+**Rule 2: Bound the work a submitted expression is allowed to perform.**
+
+An expression that is syntactically harmless can still be expensive: deep nesting or a very large exponent consumes CPU for as long as the evaluator runs. Cap the input length and the nesting depth the parser accepts, and reject rather than truncate so the caller sees a clear error.
+
+```javascript
+const MAX_DEPTH = 16;
+
+function parse(tokens, depth = 0) {
+  if (depth > MAX_DEPTH) {
+    throw new Error('expression nested too deeply');
+  }
+  // ...
+}
+```
 
 **Source files**
 
@@ -428,6 +500,52 @@ fastify.get('/', (request, reply) => {
 ```
 
 
+### Contain user-supplied paths within a storage root
+
+**Use when**
+
+A request supplies a file name, path segment, or archive entry that the application opens, writes, or extracts.
+
+**Secure rules**
+
+**Rule 1: Resolve the candidate path and verify it stays inside the storage root.**
+
+`path.join(root, request.params.name)` still leaves the root when the name contains `..`, so the check must happen after resolution rather than on the raw input. Resolve the candidate to an absolute path and confirm it is the root or sits beneath it before opening anything. Reject rather than clamp, so a traversal attempt does not silently read a neighbouring file.
+
+```javascript
+const path = require('node:path');
+const fs = require('node:fs/promises');
+
+const STORAGE_ROOT = path.resolve('./data');
+
+const resolveWithin = (root, candidate) => {
+  const target = path.resolve(root, candidate);
+  return target === root || target.startsWith(root + path.sep) ? target : null;
+};
+
+fastify.get('/files/:name', async (request, reply) => {
+  const target = resolveWithin(STORAGE_ROOT, request.params.name);
+  if (!target) {
+    return reply.code(404).send({ error: 'not found' });
+  }
+  return reply.send(await fs.readFile(target));
+});
+```
+
+**Rule 2: Apply the same containment check to every entry read out of an archive.**
+
+Entry names inside a zip or tar are attacker-controlled in exactly the way a path parameter is, and an entry named `../../etc/passwd` writes outside the extraction directory. Resolve each entry against the destination and skip any that escapes it.
+
+```javascript
+for (const entry of archive.entries) {
+  const target = resolveWithin(EXTRACT_ROOT, entry.name);
+  if (!target) {
+    continue; // entry escapes the extraction directory
+  }
+  await fs.writeFile(target, await entry.buffer());
+}
+```
+
 **Source files**
 
 - [`docs/Reference/Reply.md`](https://github.com/fastify/fastify/blob/v5.9.0/docs/Reference/Reply.md)
@@ -460,6 +578,41 @@ fastify.get('/user/:id', function(req, reply) {
 })
 ```
 
+
+### Separate command arguments from command syntax
+
+**Use when**
+
+Invoking an external program with a value that came from a request.
+
+**Secure rules**
+
+**Rule 1: Pass arguments as an array with `execFile` or `spawn`, never as a concatenated shell string.**
+
+`exec` hands its argument to a shell, so `;`, backticks, and `$(...)` inside a request value are read as commands rather than data. `execFile` and `spawn` take the program and an argument array and start the process directly, with no shell to interpret. Leave `shell` at its default of `false`; enabling it reintroduces the same parsing.
+
+```javascript
+const { execFile } = require('node:child_process');
+
+fastify.post('/convert', async (request, reply) => {
+  const { source } = request.body;
+  const output = await new Promise((resolve, reject) => {
+    execFile('convert', [source, '-resize', '100x100', 'out.png'], (error, stdout) =>
+      error ? reject(error) : resolve(stdout));
+  });
+  return { status: 'converted', output };
+});
+```
+
+**Rule 2: Reject argument values that begin with a dash.**
+
+Without a shell the value is no longer a command, but the program still parses its own arguments, so a value such as `--output=/etc/passwd` becomes an option rather than the filename the handler intended. Check the leading character and reject before invoking. A `--` end-of-options separator helps where the program supports it, but not every program does, so the leading-dash check is the guard to rely on.
+
+```javascript
+if (source.startsWith('-')) {
+  return reply.code(400).send({ error: 'invalid source' });
+}
+```
 
 **Source files**
 
@@ -826,6 +979,45 @@ fastify.get('/custom-header', (request, reply) => {
 ```
 
 
+### Encode untrusted data for the context the response places it in
+
+**Use when**
+
+Returning request-derived text or stored content in a response body, or writing request data into application logs.
+
+**Secure rules**
+
+**Rule 1: Escape untrusted values when the route composes an HTML body itself.**
+
+`reply.send(object)` serializes JSON, which the browser does not execute. The exposure appears when a route builds markup instead: `reply.type('text/html')` with a concatenated string places untrusted values into an executable context, so stored `<script>` runs under your origin. Escape every interpolated value, or return structured data and let the client render it. Send `X-Content-Type-Options: nosniff` so the browser does not sniff the body into a richer type.
+
+```javascript
+const escapeHtml = (value) =>
+  String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+
+fastify.get('/profiles/:id', async (request, reply) => {
+  const profile = await loadProfile(request.params.id); // untrusted
+  reply.header('X-Content-Type-Options', 'nosniff');
+  return reply.type('text/html').send(`<h1>${escapeHtml(profile.name)}</h1>`);
+});
+```
+
+**Rule 2: Strip newline and control characters before writing request data to a log.**
+
+A value containing `\n` or `\r` splits one entry into two, letting a caller forge lines that appear to come from the server and push real events out of view. Replace line breaks and other control characters before logging, and cap the length so a single request cannot flood the log.
+
+```javascript
+const sanitizeForLog = (value, limit = 200) =>
+  String(value).replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, limit);
+
+fastify.post('/events', async (request, reply) => {
+  request.log.info({ event: sanitizeForLog(request.body.message) }, 'client event');
+  return { status: 'recorded' };
+});
+```
+
 **Source files**
 
 - [`docs/Reference/Reply.md`](https://github.com/fastify/fastify/blob/v5.9.0/docs/Reference/Reply.md)
@@ -1042,6 +1234,39 @@ console.log(fastify.initialConfig.https);
 
 Fastify's delay-accepting-requests guide stores a provider-supplied `magicKey` in a decorator, but identifies that implementation as not production-ready and not horizontally scalable. Storing the `magicKey` elsewhere, such as in a cache database, is one possible improvement.
 
+
+### Protect secrets a caller entrusts to the service
+
+**Use when**
+
+An endpoint accepts a secret from a caller, stores it, and returns it on a later request.
+
+**Secure rules**
+
+**Rule 1: Resolve an encryption key once at startup and never mint one per request.**
+
+A key created inside a handler is different on every call, so anything encrypted on one request cannot be decrypted on the next and the stored data is silently lost. Read the configured key once as the process starts. Where no dedicated key is configured, derive one deterministically from an existing application secret rather than generating a random one, so restarts stay readable.
+
+```javascript
+const crypto = require('node:crypto');
+
+// Resolved once, at startup -- never inside a request handler.
+const SECRET_KEY = process.env.SECRET_KEY
+  ? Buffer.from(process.env.SECRET_KEY, 'base64')
+  : crypto.createHash('sha256').update(process.env.APP_SECRET ?? '').digest();
+```
+
+**Rule 2: Keep stored secrets out of logs, error bodies, and collection responses.**
+
+A secret returned by a list endpoint, echoed in a validation error, or written to a log line reaches every reader of that output, not just its owner. Return the value only on the endpoint documented to return it, and log an identifier instead of the secret itself.
+
+```javascript
+fastify.get('/secrets', async (request) => {
+  const rows = await listSecretsFor(request.user.id);
+  // The listing carries identifiers only; the value has its own endpoint.
+  return rows.map(({ id, name, updatedAt }) => ({ id, name, updatedAt }));
+});
+```
 
 **Source files**
 

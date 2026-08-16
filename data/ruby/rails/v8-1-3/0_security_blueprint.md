@@ -30,8 +30,12 @@ Enable request forgery protection using `protect_from_forgery with: :exception` 
 
 6. **Sanitize Outputs and Protect Static Files**
 
-Rely on standard ERB interpolation for automatic HTML auto-escaping and avoid bypassing encoding with the `raw` helper. Disable built-in static file servers when upstream reverse proxies handle asset delivery, and prevent path traversal by validating file download paths against database records using `Rails.root.join` and `File.exist?`.
+Rely on standard ERB interpolation for automatic HTML auto-escaping and avoid bypassing encoding with the `raw` helper; when a feature must emit caller-supplied HTML, pass it through the `sanitize` helper with an explicit allowlist, and strip control characters from untrusted values before writing them to logs. Disable built-in static file servers when upstream reverse proxies handle asset delivery, and prevent path traversal by validating file download paths against database records using `Rails.root.join` and `File.exist?`.
 
 7. **Secure Production Environments and Sensitive Data Logs**
 
 Ensure `config.consider_all_requests_local` is explicitly set to `false` in production to suppress detailed exception backtraces, and configure `config.filter_parameters` to sanitize sensitive values such as passwords, tokens, and credentials from application logs.
+
+8. **Keep Untrusted Input Out of Code Execution**
+
+Never evaluate request data with `eval` or compile it as an ERB template, and never resolve a method or class name from parameters via `send`, `public_send`, or `constantize`. Map approved identifiers to fixed methods, classes, or operations so request data can never select arbitrary code to run.

@@ -14,7 +14,7 @@ Abort middleware execution immediately upon authorization failure without callin
 
 2. **Secure Authentication and Credential Verification**
 
-Provide non-nil Validator functions and use `subtle.ConstantTimeCompare` for API keys in `keyauth.New`, and configure `basicauth.New` with bcrypt password hashes. Avoid extracting sensitive credentials from URL query parameters.
+Provide non-nil Validator functions and use `subtle.ConstantTimeCompare` for API keys in `keyauth.New`, and configure `basicauth.New` with bcrypt password hashes. Store passwords as `bcrypt` or `argon2id` hashes rather than a fast digest, draw session identifiers and API tokens from `crypto/rand`, and use a keyed `hmac` digest instead when the secret must also serve as a database lookup key. Avoid extracting sensitive credentials from URL query parameters.
 
 3. **Validate Request Input and Handle Binding Errors**
 
@@ -43,3 +43,11 @@ Enable `GETOnly` mode on read-only services and restrict state modifications to 
 9. **Ensure Memory Safety in Asynchronous Contexts**
 
 Avoid passing pooled `fiber.Ctx` instances or raw header slices directly into background goroutines. Obtain a standalone Go context using `c.Context()` or explicitly copy references before retaining them outside the request handler lifecycle.
+
+10. **Encode Output for the Context That Receives It**
+
+Serve stored user content as `text/plain; charset=utf-8` with `X-Content-Type-Options: nosniff`, render markup through `html/template` rather than string concatenation, and run user-authored markup through an allowlist sanitizer such as `bluemonday` where the response must be `text/html`. Strip newline and control characters from request data before writing it to a log, and cap its length.
+
+11. **Restrict Command Execution and Expression Evaluation**
+
+Run external programs with `exec.Command(name, args...)` rather than through a shell, keep the program name a constant your own code chose, and separate arguments from filenames with `--`. Parse caller-supplied expressions with a parser that permits only known operators instead of an embedded interpreter, and bound the work it may do.
