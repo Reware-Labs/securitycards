@@ -39,6 +39,45 @@ fastify.get('/custom-header', (request, reply) => {
 ```
 
 
+### Encode untrusted data for the context the response places it in
+
+**Use when**
+
+Returning request-derived text or stored content in a response body, or writing request data into application logs.
+
+**Secure rules**
+
+**Rule 1: Escape untrusted values when the route composes an HTML body itself.**
+
+`reply.send(object)` serializes JSON, which the browser does not execute. The exposure appears when a route builds markup instead: `reply.type('text/html')` with a concatenated string places untrusted values into an executable context, so stored `<script>` runs under your origin. Escape every interpolated value, or return structured data and let the client render it. Send `X-Content-Type-Options: nosniff` so the browser does not sniff the body into a richer type.
+
+```javascript
+const escapeHtml = (value) =>
+  String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+
+fastify.get('/profiles/:id', async (request, reply) => {
+  const profile = await loadProfile(request.params.id); // untrusted
+  reply.header('X-Content-Type-Options', 'nosniff');
+  return reply.type('text/html').send(`<h1>${escapeHtml(profile.name)}</h1>`);
+});
+```
+
+**Rule 2: Strip newline and control characters before writing request data to a log.**
+
+A value containing `\n` or `\r` splits one entry into two, letting a caller forge lines that appear to come from the server and push real events out of view. Replace line breaks and other control characters before logging, and cap the length so a single request cannot flood the log.
+
+```javascript
+const sanitizeForLog = (value, limit = 200) =>
+  String(value).replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, limit);
+
+fastify.post('/events', async (request, reply) => {
+  request.log.info({ event: sanitizeForLog(request.body.message) }, 'client event');
+  return { status: 'recorded' };
+});
+```
+
 **Source files**
 
 - [`docs/Reference/Reply.md`](https://github.com/fastify/fastify/blob/v5.9.0/docs/Reference/Reply.md)

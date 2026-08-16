@@ -50,24 +50,27 @@ async def read_item(
     return {"item_id": item_id}
 ```
 
-**Rule 3: Forbid extra input fields in Pydantic models to prevent mass assignment and parameter pollution**
+**Rule 3: Reject extra input fields only where they would be bound to stored or privileged state**
 
-Configure Pydantic models handling form bodies or cookies with `model_config = ConfigDict(extra='forbid')` so that unexpected or unauthorized extra fields trigger an HTTP `422 Unprocessable Entity` response instead of being ignored.
+`model_config = ConfigDict(extra='forbid')` stops mass assignment — a caller smuggling an unexpected field such as `role` or `is_admin` into a model whose values are written to a record. Apply it to create and update bodies that map onto persisted objects. Do not apply it to inputs you only read known fields from, such as login credentials or lookup requests: a client may send a documented superset of fields (often the same object it received earlier), and forbidding extras turns a valid request into a `422`. There, read the fields you need and let the rest be ignored.
 
 ```python
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
 
-class UserForm(BaseModel):
+# Mass-assignment sink: these values are written to the user's record, so an
+# unexpected field must be rejected rather than silently bound.
+class ProfileUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    username: str
-    password: str
+    display_name: str
+    bio: str
 
 app = FastAPI()
 
-@app.post("/login/")
-def login(form_data: UserForm = Form()):
-    return {"username": form_data.username}
+@app.put("/users/{user_id}/profile")
+def update_profile(user_id: int, update: ProfileUpdate):
+    save_profile(user_id, update.display_name, update.bio)
+    return {"status": "updated"}
 ```
 
 **Rule 4: Explicitly specify element types when accepting list query parameters**

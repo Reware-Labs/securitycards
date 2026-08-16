@@ -408,6 +408,76 @@ export class AuthService {
 
 - [`sample/19-auth-jwt/src/auth/auth.service.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/19-auth-jwt/src/auth/auth.service.ts)
 
+## Category: dangerous execution
+
+### Evaluate Submitted Expressions with a Parser, Not the JavaScript Engine
+
+**Use when**
+
+A request supplies an expression, formula, filter, or template that a controller, service, or pipe computes a result from.
+
+**Secure rules**
+
+**Rule 1: Never pass request data to `eval`, `new Function`, or `node:vm`.**
+
+Each of these compiles its argument as JavaScript with the process's full authority, so an endpoint that evaluates arithmetic also runs `require('node:child_process')`. `node:vm` does not close the gap: it isolates trusted code for convenience and its context is escapable, so it is not a boundary against hostile input. Accept only the grammar the feature needs, then evaluate the parsed tree yourself. A custom `PipeTransform` is the natural place for the check, because it rejects before the handler is entered.
+
+```typescript
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
+
+const ARITHMETIC = /^[0-9+\-*/(). ]{1,100}$/;
+
+@Injectable()
+export class ArithmeticExpressionPipe implements PipeTransform<string, string> {
+  transform(value: string): string {
+    if (typeof value !== 'string' || !ARITHMETIC.test(value)) {
+      throw new BadRequestException('unsupported expression');
+    }
+    return value;
+  }
+}
+```
+
+**Rule 2: Bound the work a submitted expression is allowed to perform.**
+
+An expression can be syntactically harmless and still expensive: deep nesting, a very large exponent, or a repetition count consumes CPU for as long as the evaluator runs, and one request then occupies the event loop for every other. Cap the accepted length and the nesting depth, and reject rather than truncate so the caller receives a clear error instead of a silently different answer.
+
+```typescript
+const MAX_DEPTH = 16;
+
+function parseExpression(tokens: string[], depth = 0): Node {
+  if (depth > MAX_DEPTH) {
+    throw new BadRequestException('expression nested too deeply');
+  }
+  return parseTerm(tokens, depth + 1);
+}
+```
+
+**Rule 3: Resolve dynamic behavior through a fixed map, never by loading a named module or class.**
+
+An identifier taken from a request and passed to `require()`, a dynamic `import()`, or a container lookup lets the caller choose which code runs, and the reachable set is every module on disk rather than the handful the feature intends. Map the approved identifiers to implementations explicitly and reject anything absent from the map, so adding a capability is a code change rather than a request parameter.
+
+```typescript
+const EXPORTERS: Record<string, () => Exporter> = {
+  csv: () => new CsvExporter(),
+  json: () => new JsonExporter(),
+};
+
+const createExporter = (format: string): Exporter => {
+  const factory = EXPORTERS[format];
+  if (!factory) {
+    throw new BadRequestException('unsupported format');
+  }
+  return factory();
+};
+```
+
+
+**Source files**
+
+- [`content/pipes.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/pipes.md) _(documentation repository)_
+- [`content/techniques/validation.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/validation.md) _(documentation repository)_
+
 ## Category: file handling
 
 ### Secure Static File Serving and Path Boundaries
@@ -520,6 +590,71 @@ export class FileUploadController {
 
 - [`sample/29-file-upload/e2e/app/app.e2e-spec.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/29-file-upload/e2e/app/app.e2e-spec.ts)
 
+### Contain Request-Derived Paths Within Their Intended Directory
+
+**Use when**
+
+Building a filesystem path from a route parameter, query value, uploaded filename, or archive entry name.
+
+**Secure rules**
+
+**Rule 1: Resolve the path first, then verify it is still inside the base directory.**
+
+`join()` collapses `..` segments, so a parameter of `../../etc/passwd` produces a path outside the directory the handler intended without any part of the string looking unusual. Rejecting on a substring such as `'..'` is not equivalent: it misses absolute paths and encoded variants while also rejecting legitimate names. Resolve to an absolute path and compare it against the resolved base, keeping the trailing separator in the comparison so that a sibling directory sharing a name prefix does not pass.
+
+```typescript
+import { NotFoundException } from '@nestjs/common';
+import { resolve, sep } from 'path';
+
+const STORAGE_ROOT = resolve(process.cwd(), 'storage');
+
+const resolveWithin = (name: string): string => {
+  const target = resolve(STORAGE_ROOT, name);
+  if (target !== STORAGE_ROOT && !target.startsWith(STORAGE_ROOT + sep)) {
+    throw new NotFoundException();
+  }
+  return target;
+};
+```
+
+**Rule 2: Apply the same containment to every entry read out of an archive.**
+
+Entry names inside a zip or tar are caller-controlled strings that the extraction step turns into paths, so an entry named `../../app/main.js` writes outside the extraction directory and can replace a file the application later executes. Run each entry name through the same resolve-and-verify check before creating anything, and skip entries that are not regular files -- a symbolic link re-introduces the escape after the name itself has been checked.
+
+```typescript
+for (const entry of archive.entries) {
+  if (!entry.isFile()) {
+    continue;
+  }
+  const target = resolveWithin(entry.name);
+  await writeFile(target, await entry.buffer());
+}
+```
+
+**Rule 3: Generate the stored name for an upload instead of trusting the supplied one.**
+
+A multipart filename is chosen by the caller and travels with the request, so reusing it as the stored name carries path separators and leading dots into the filesystem, and lets one upload replace another user's file by reusing its name. Store the file under an identifier the server generates, and keep the original name as metadata when it has to be shown back to the user.
+
+```typescript
+import { randomUUID } from 'crypto';
+import { extname } from 'path';
+
+const storedName = (originalName: string): string => {
+  const extension = extname(originalName).toLowerCase();
+  return /^\.[a-z0-9]{1,8}$/.test(extension)
+    ? `${randomUUID()}${extension}`
+    : randomUUID();
+};
+```
+
+
+**Source files**
+
+- [`sample/29-file-upload/src/app.controller.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/29-file-upload/src/app.controller.ts)
+- [`packages/common/file-stream/streamable-file.ts`](https://github.com/nestjs/nest/blob/v11.1.28/packages/common/file-stream/streamable-file.ts)
+- [`content/techniques/streaming-files.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/streaming-files.md) _(documentation repository)_
+- [`content/techniques/file-upload.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/file-upload.md) _(documentation repository)_
+
 ## Category: injection
 
 ### Use Parameterized Methods to Prevent SQL Injection
@@ -557,10 +692,67 @@ export class UsersService {
 }
 ```
 
+**Rule 2: Bind values as parameters whenever a raw SQL string is unavoidable.**
+
+The repository methods build the statement for you, but `query()`, `createQueryBuilder().where()` and a raw database driver all accept a string, and a value concatenated into that string is read as syntax rather than data. Supply the value separately -- a named parameter for the query builder, a positional placeholder for a raw statement -- so the driver never parses it. This holds for every clause: quoting a value by hand is not a substitute, and an identifier such as a column or sort direction cannot be parameterized at all, so it has to be checked against a fixed list of permitted names.
+
+```typescript
+const SORTABLE = ['created_at', 'name'] as const;
+
+async search(term: string, sortBy: string): Promise<User[]> {
+  const column = SORTABLE.includes(sortBy as never) ? sortBy : 'created_at';
+  return this.userRepository
+    .createQueryBuilder('user')
+    .where('user.name LIKE :term', { term: `%${term}%` })
+    .orderBy(`user.${column}`)
+    .getMany();
+}
+```
+
 
 **Source files**
 
 - [`sample/05-sql-typeorm/src/users/users.service.spec.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/05-sql-typeorm/src/users/users.service.spec.ts)
+- [`content/techniques/sql.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/sql.md) _(documentation repository)_
+
+### Run External Commands with an Argument Array, Never a Shell String
+
+**Use when**
+
+A service invokes an external program -- an archiver, converter, or other command-line tool -- with any part of the invocation derived from a request.
+
+**Secure rules**
+
+**Rule 1: Pass arguments as an array to `execFile` or `spawn`, and do not enable a shell.**
+
+`exec` and `execFile`/`spawn` with `shell: true` hand the whole string to `/bin/sh`, where `;`, `|`, backticks and `$(...)` are syntax, so one filename can append a second command. The array forms pass each element to the program as a single argument with no shell in between, so a value containing shell metacharacters stays one argument. Build the array from fixed flags plus the validated value, never by joining strings.
+
+```typescript
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+
+const run = promisify(execFile);
+
+async convert(source: string, target: string): Promise<void> {
+  await run('ffmpeg', ['-i', source, '-y', target], { timeout: 10_000 });
+}
+```
+
+**Rule 2: Stop a request-derived value from being read as an option.**
+
+Removing the shell does not stop a value that begins with `-` from being interpreted by the program itself, so a filename such as `--output=/etc/passwd` becomes a flag rather than an argument. Reject leading dashes on values that are meant to be operands, or place the value after the `--` separator where the program supports it.
+
+```typescript
+if (name.startsWith('-')) {
+  throw new BadRequestException('invalid name');
+}
+await run('gzip', ['--decompress', '--', name], { timeout: 10_000 });
+```
+
+
+**Source files**
+
+- [`content/pipes.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/pipes.md) _(documentation repository)_
 
 ## Category: input contract definition
 
@@ -769,6 +961,128 @@ bootstrap();
 
 - [`content/techniques/performance.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/performance.md) _(documentation repository)_
 
+## Category: output encoding
+
+### Encode Untrusted Data for the Context the Response Places It In
+
+**Use when**
+
+Returning request-derived or stored text inside an HTML response body, or rendering a view with values that originated from a client.
+
+**Secure rules**
+
+**Rule 1: Escape interpolated values when a handler composes an HTML body itself.**
+
+Returning an object from a controller serializes JSON, which the browser does not execute. The exposure appears when a handler builds markup instead: `@Header('Content-Type', 'text/html')` around a concatenated template literal places untrusted values into an executable context, so a stored `<script>` runs under your origin. Escape every interpolated value, and set `X-Content-Type-Options: nosniff` so the browser does not sniff a response into a richer type than it was labelled.
+
+```typescript
+import { Controller, Get, Header, Param } from '@nestjs/common';
+
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+const escapeHtml = (value: unknown): string =>
+  String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
+
+@Controller('profiles')
+export class ProfilesController {
+  @Get(':id')
+  @Header('Content-Type', 'text/html')
+  @Header('X-Content-Type-Options', 'nosniff')
+  async show(@Param('id') id: string): Promise<string> {
+    const profile = await this.profiles.find(id);
+    return `<h1>${escapeHtml(profile.name)}</h1>`;
+  }
+}
+```
+
+**Rule 2: Keep view rendering on the escaping interpolation form.**
+
+A template engine registered with `app.setViewEngine()` and used through `@Render()` escapes interpolated values by default, which is why rendering a view is safer than concatenating a string. That default is per-syntax, not per-engine: Handlebars escapes `{{ value }}` but emits `{{{ value }}}` verbatim, and other engines have an equivalent raw form. Reserve the raw form for markup the application itself produced.
+
+```html
+<h1>{{ message }}</h1>
+```
+
+**Rule 3: Sanitize, rather than escape, when the response is specified to carry caller-supplied markup.**
+
+Escaping is the right answer when the value is text. When an endpoint is specified to return the caller's own markup as `text/html`, escaping it defeats the feature and returning plain text contradicts the contract. Run the value through an allowlist sanitizer that keeps the permitted elements and attributes and drops everything else, including event-handler attributes and `javascript:` URLs. Do not hand-roll the filter with a regular expression; stripping `<script>` does not stop `<img onerror=...>`.
+
+```typescript
+import * as sanitizeHtml from 'sanitize-html';
+
+const renderComment = (markup: string): string =>
+  sanitizeHtml(markup, {
+    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'ol', 'li', 'code'],
+    allowedAttributes: { a: ['href', 'title'] },
+    allowedSchemes: ['http', 'https', 'mailto'],
+  });
+```
+
+
+**Source files**
+
+- [`sample/15-mvc/src/app.controller.ts`](https://github.com/nestjs/nest/blob/v11.1.28/sample/15-mvc/src/app.controller.ts)
+- [`sample/15-mvc/views/index.hbs`](https://github.com/nestjs/nest/blob/v11.1.28/sample/15-mvc/views/index.hbs)
+- [`content/techniques/mvc.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/mvc.md) _(documentation repository)_
+
+### Neutralize Request Data Before It Reaches the Log
+
+**Use when**
+
+Passing request-derived values -- headers, query parameters, body fields, usernames -- to `Logger` or any other logging sink.
+
+**Secure rules**
+
+**Rule 1: Strip newline and control characters before logging a request-derived value.**
+
+A value containing `\n` or `\r` splits one entry into two, letting a caller forge lines that appear to have come from the server and push real events out of the visible window. Replace line breaks and other control characters before the value reaches `Logger`, and cap its length so a single request cannot flood the log. Do this at the point of logging rather than at the point of input, so the protection does not depend on which handler the value arrived through.
+
+```typescript
+import { Body, Controller, Logger, Post } from '@nestjs/common';
+
+const sanitizeForLog = (value: unknown, limit = 200): string =>
+  String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .slice(0, limit);
+
+@Controller('events')
+export class EventsController {
+  private readonly logger = new Logger(EventsController.name);
+
+  @Post()
+  record(@Body('message') message: string) {
+    this.logger.log(`client event: ${sanitizeForLog(message)}`);
+    return { status: 'recorded' };
+  }
+}
+```
+
+**Rule 2: Log an identifier for a secret, never the secret itself.**
+
+Tokens, passwords, session identifiers and API keys that reach the log outlive the request in a store with weaker access control than the one they came from, and they survive there in backups. Log a stable non-reversible reference when entries need to be correlated, and keep the value out of the message entirely.
+
+```typescript
+import { createHash } from 'crypto';
+
+const tokenReference = (token: string): string =>
+  createHash('sha256').update(token).digest('hex').slice(0, 12);
+
+this.logger.log(`authenticated request for token ${tokenReference(token)}`);
+```
+
+
+**Source files**
+
+- [`packages/common/services/console-logger.service.ts`](https://github.com/nestjs/nest/blob/v11.1.28/packages/common/services/console-logger.service.ts)
+- [`packages/common/services/logger.service.ts`](https://github.com/nestjs/nest/blob/v11.1.28/packages/common/services/logger.service.ts)
+- [`content/techniques/logger.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/techniques/logger.md) _(documentation repository)_
+
 ## Category: resource exhaustion
 
 ### Prevent Connection and Socket Exhaustion in Server-Sent Events
@@ -814,6 +1128,91 @@ const app = await NestFactory.create(AppModule, {
 - [`integration/nest-application/sse/src/app.controller.ts`](https://github.com/nestjs/nest/blob/v11.1.28/integration/nest-application/sse/src/app.controller.ts)
 - [`packages/core/router/router-response-controller.ts`](https://github.com/nestjs/nest/blob/v11.1.28/packages/core/router/router-response-controller.ts)
 - [`content/faq/keep-alive-connections.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/faq/keep-alive-connections.md) _(documentation repository)_
+
+### Bound Request Bodies and the Expansion of Untrusted Input
+
+**Use when**
+
+Accepting request bodies, uploads, or any input the application decompresses, expands, or repeats.
+
+**Secure rules**
+
+**Rule 1: Set an explicit body size limit rather than relying on the parser default.**
+
+The body parser buffers the whole request before a pipe, guard, or handler sees any of it, so validation rules on a DTO bound nothing about how much memory the request consumes. Call `useBodyParser()` on the Express application with a limit chosen for the largest legitimate payload; oversized requests are then refused at the parser, before the framework builds an object out of them.
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useBodyParser('json', { limit: '1mb' });
+  app.useBodyParser('urlencoded', { limit: '1mb', extended: true });
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+**Rule 2: Cap the output of a decompression, not just the size of its input.**
+
+A size limit on the upload bounds the compressed bytes, and a compressed format's whole purpose is that those bytes expand -- a few kilobytes of archive can produce gigabytes, exhausting memory or disk while every check on the request passed. Count bytes as they are produced and abort the moment the running total crosses the ceiling, and bound the number of entries as well so many small members cannot achieve the same result. Stream each entry through the counter rather than decompressing it into a buffer and measuring afterwards, because by then the memory has already been spent.
+
+```typescript
+const MAX_EXTRACTED_BYTES = 16 * 1024 * 1024;
+const MAX_ENTRIES = 1_000;
+
+let written = 0;
+let entries = 0;
+
+for await (const chunk of entry.stream()) {
+  written += chunk.length;
+  if (written > MAX_EXTRACTED_BYTES || ++entries > MAX_ENTRIES) {
+    throw new BadRequestException('archive too large');
+  }
+  await sink.write(chunk);
+}
+```
+
+**Rule 3: Bound nesting depth, and carry one budget across the whole recursive expansion.**
+
+An archive entry can itself be an archive. A per-pass limit then bounds nothing: each individual layer looks small and passes its own check, while the product across layers is unbounded -- an outer archive whose members are archives expands by a multiple at every level. Cap how deep extraction may recurse, and thread a *single* running byte and entry total through the recursion rather than resetting it per archive, so the budget is spent across the whole tree and not per layer. Refuse nested archives outright when the feature does not need them.
+
+```typescript
+const MAX_DEPTH = 2;
+
+interface Budget { bytes: number; entries: number; }
+
+async function extract(archive: Archive, depth: number, budget: Budget): Promise<void> {
+  if (depth > MAX_DEPTH) {
+    throw new BadRequestException('archive nested too deeply');
+  }
+  for (const entry of archive.entries) {
+    budget.bytes += entry.uncompressedSize;
+    if (++budget.entries > MAX_ENTRIES || budget.bytes > MAX_EXTRACTED_BYTES) {
+      throw new BadRequestException('archive too large');
+    }
+    if (isArchive(entry)) {
+      await extract(await open(entry), depth + 1, budget); // same budget object
+    }
+  }
+}
+```
+
+**Rule 4: Give every externally triggered operation a deadline.**
+
+A spawned converter, an outbound HTTP call, or a query with no timeout occupies its resources for as long as the far side chooses, so a slow dependency turns into exhausted workers rather than a failed request. Set an explicit timeout on the operation and return an error when it elapses, so the failure is bounded and visible instead of accumulating.
+
+```typescript
+await run('ffmpeg', ['-i', source, '-y', target], { timeout: 10_000 });
+```
+
+
+**Source files**
+
+- [`content/faq/raw-body.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/faq/raw-body.md) _(documentation repository)_
+- [`content/security/rate-limiting.md`](https://github.com/nestjs/docs.nestjs.com/blob/master/content/security/rate-limiting.md) _(documentation repository)_
 
 ## Category: runtime environment hardening
 

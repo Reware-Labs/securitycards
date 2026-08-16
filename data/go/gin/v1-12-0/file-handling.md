@@ -32,6 +32,19 @@ dst := filepath.Join("/safe/upload/dir", filename)
 c.SaveUploadedFile(file, dst)
 ```
 
+**Rule 2: Read text fields as text, not as uploaded files**
+
+A multipart request can contain both ordinary fields and files. Use `c.PostForm` or `c.GetPostForm` for text fields and reserve `c.FormFile` for actual file parts; treating a text field as a file rejects valid requests.
+
+```go
+page, ok := c.GetPostForm("profile_page")
+if !ok {
+    c.String(http.StatusBadRequest, "Missing profile page")
+    return
+}
+photo, err := c.FormFile("profile_photo")
+```
+
 
 ### Secure Static File Serving and Path Containment in Gin
 
@@ -83,4 +96,46 @@ Ensure directory listing is explicitly disabled to prevent exposing directory in
 router := gin.Default()
 router.Static("/public", "./public")
 router.StaticFS("/assets", gin.Dir("./assets", false))
+```
+
+
+### Contain archive members inside the extraction directory
+
+**Use when**
+
+Unpacking a zip or tar archive that arrived as an upload or from a caller-supplied location.
+
+**Secure rules**
+
+**Rule 1: Confirm each member's destination stays inside the extraction root.**
+
+Archive entries carry their own path and neither `archive/zip` nor `archive/tar` sanitizes it, so a member named `../../etc/cron.d/job` writes exactly there. `filepath.IsLocal` rejects absolute paths, `..` components, and reserved Windows names in one call, and joining a local name to the root cannot leave it. Skip entries that are not regular files, so no symlink redirects later reads.
+
+```go
+func extractMember(root string, f *zip.File) error {
+    if !filepath.IsLocal(f.Name) {
+        return fmt.Errorf("unsafe archive entry: %s", f.Name)
+    }
+    if !f.FileInfo().Mode().IsRegular() {
+        return nil // skip directories, symlinks, devices
+    }
+    dst := filepath.Join(root, f.Name)
+    if err := os.MkdirAll(filepath.Dir(dst), 0o750); err != nil {
+        return err
+    }
+    src, err := f.Open()
+    if err != nil {
+        return err
+    }
+    defer src.Close()
+
+    out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o640)
+    if err != nil {
+        return err
+    }
+    defer out.Close()
+
+    _, err = io.Copy(out, src)
+    return err
+}
 ```

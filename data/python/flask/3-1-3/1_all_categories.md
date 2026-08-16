@@ -724,6 +724,26 @@ Use Jinja's `|tojson` filter when embedding server-side data into HTML `<script>
 <div data-chart='{{ chart_data|tojson }}'></div>
 ```
 
+**Rule 4: Sanitize user-authored markup before returning it as `text/html`.**
+
+Rules 1 to 3 cover values interpolated into markup you control; autoescaping never sees a whole page a user wrote and the application serves as-is. Where the contract requires `text/html`, keep that content type — a security rule hardens a specification rather than amending it — and run the stored markup through an allowlist sanitizer: `nh3` keeps the formatting tags the feature needs and drops `<script>`, `onload`-style handler attributes, and `javascript:` URLs. Where no sanitizer is available, `markupsafe.escape` makes the page inert at the cost of showing its tags as text. Send `X-Content-Type-Options: nosniff` either way.
+
+```python
+import nh3
+from flask import Response
+
+@app.get("/pages/<slug>")
+def read_page(slug):
+    page = load_submitted_page(slug)   # user-authored markup
+    if page is None:
+        return {"message": "Not found"}, 404
+    return Response(
+        nh3.clean(page),               # keeps safe tags, drops scripts and handlers
+        mimetype="text/html",
+        headers={"X-Content-Type-Options": "nosniff"},
+    )
+```
+
 
 ## Category: resource exhaustion
 

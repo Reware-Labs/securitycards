@@ -103,3 +103,62 @@ def update_item(item_id: str):
         )
     return {"item_id": item_id, "name": "The great Plumbus"}
 ```
+
+
+### Take the acting identity from the verified credential
+
+**Use when**
+
+A route reads or modifies data belonging to a specific user and the request also carries a username, account id, or email.
+
+**Secure rules**
+
+**Rule 1: Resolve the subject from the authentication dependency, not the payload.**
+
+An identifier in the request says who the caller *claims* to be; only the verified token says who they are. Reading `owner` from the body lets any authenticated caller reach anyone else's data by editing one field. Key the lookup on the dependency's value, and where the contract carries the identifier too, compare and reject with `403`.
+
+```python
+from typing import Annotated
+from fastapi import Depends, FastAPI, HTTPException, status
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class NotePayload(BaseModel):
+    owner: str
+    body: str
+
+@app.post("/notes")
+def create_note(
+    payload: NotePayload,
+    current_user: Annotated[str, Depends(get_current_user)],
+):
+    if payload.owner != current_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot act on behalf of another user",
+        )
+    save_note(current_user, payload.body)   # keyed by the verified identity
+    return {"status": "created"}
+```
+
+**Rule 2: Apply the ownership check on read paths as well as writes.**
+
+Authorization declared handler by handler is only as complete as the last route somebody added, and a `GET` filtered by a query parameter is as exploitable as an unguarded `PUT`. Scope the query by the authenticated subject so an unowned row is never loaded, and prefer `404` over `403` where existence is sensitive. `APIRouter(dependencies=[...])` declares it once.
+
+```python
+from typing import Annotated
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
+
+app = FastAPI()
+router = APIRouter(dependencies=[Depends(get_current_user)])
+
+@router.get("/notes")
+def list_notes(current_user: Annotated[str, Depends(get_current_user)]):
+    records = load_notes(owner=current_user)   # scoped, not filtered afterwards
+    if not records:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"notes": records}
+
+app.include_router(router)
+```

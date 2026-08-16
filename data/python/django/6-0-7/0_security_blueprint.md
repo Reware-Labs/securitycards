@@ -1,6 +1,6 @@
 # Security blueprint
 
-Repository: `https://github.com/django/django#6.1rc1`
+Repository: `https://github.com/django/django#6.0.7`
 
 ## Security posture
 
