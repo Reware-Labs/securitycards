@@ -34,6 +34,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@types/node": "^26.1.1",
+    "axios": "1.19.0",
     "markdownlint-cli2": "^0.23.2",
     "typescript": "^6.0.3",
     "wrangler": "^4.114.0"
