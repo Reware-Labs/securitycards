@@ -3438,7 +3438,7 @@
                 {
                   "slug": "input-driven-boundary-selection",
                   "title": "Input Driven Boundary Selection",
-                  "description": "Building request paths using dynamic user input combined with a `baseURL` in Axios.",
+                  "description": "Building a request path from an opaque user ID and an application-controlled `baseURL` and route prefix in Axios.",
                   "canonicalUrl": "https://securitycards.rewarelabs.com/downloads/javascript/axios/v1-19-0/input-driven-boundary-selection.md",
                   "path": "/downloads/javascript/axios/v1-19-0/input-driven-boundary-selection.md"
                 },

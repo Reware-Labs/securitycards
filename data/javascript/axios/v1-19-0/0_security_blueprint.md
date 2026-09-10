@@ -34,7 +34,7 @@ Assign dynamic header values through `AxiosHeaders` or standard request configur
 
 7. **Enforce strict URL formatting and protocol allowlists**
 
-Wrap Axios requests in try-catch blocks to handle `ERR_INVALID_URL` exceptions from malformed inputs, validate complete request destinations against strict application-controlled allowlists, and strip leading slashes from user-supplied path segments to prevent protocol-relative redirection.
+Wrap Axios requests in try-catch blocks to handle `ERR_INVALID_URL` exceptions from malformed inputs and validate complete request destinations against application-controlled allowlists. When interpolating an ID into a fixed route, validate it and encode it as one path segment with `encodeURIComponent()`; reject empty IDs and standalone `.` or `..` segments. Do not treat `baseURL` as a path boundary, and validate redirects and the server's handling of encoded separators separately.
 
 8. **Enforce TLS verification and custom CA configuration**
 
