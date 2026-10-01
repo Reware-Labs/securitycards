@@ -1,0 +1,46 @@
+name: Fix a card
+description: Report something wrong or unclear in an existing card.
+title: "[card fix]: "
+labels: ["help wanted", "documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve a card. Cards are generated and synced from a separate
+        source, so a maintainer will carry your fix back upstream after review.
+  - type: input
+    id: card
+    attributes:
+      label: Card
+      description: The card URL on the site, or the file path under data/.
+      placeholder: https://securitycards.rewarelabs.com/... or data/javascript/axios/v1-19-0/...
+    validations:
+      required: true
+  - type: input
+    id: library
+    attributes:
+      label: Library and version
+      placeholder: axios 1.19.0
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: Describe the issue. If the guidance is incorrect, explain why.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested fix
+      description: How should the card read instead? A rough draft is fine.
+    validations:
+      required: false
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links that back up the change, such as docs, advisories, or source code.
+    validations:
+      required: false

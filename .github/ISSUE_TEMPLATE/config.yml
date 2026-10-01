@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Browse the cards
+    url: https://securitycards.rewarelabs.com
+    about: Look up existing security guidance by language, library, version, and category.
+  - name: Read the disclaimer
+    url: https://securitycards.rewarelabs.com/disclaimer/
+    about: Understand the limits of this guidance before you rely on it.

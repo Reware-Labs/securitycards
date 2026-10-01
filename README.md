@@ -73,3 +73,11 @@ Run the full set of checks with:
 ```bash
 npm run validate
 ```
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, card
+formatting rules, and the path for requesting a new card. Browse
+[issues marked `help wanted`](https://github.com/Reware-Labs/securitycards/labels/help%20wanted)
+for opportunities, or [open an issue](https://github.com/Reware-Labs/securitycards/issues/new/choose)
+to report a card problem or suggest a docs or tooling improvement.
