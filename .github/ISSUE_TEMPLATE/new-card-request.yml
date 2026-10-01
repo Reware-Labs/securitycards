@@ -1,0 +1,54 @@
+name: Request a new card
+description: Ask for a card covering a library or version we do not have yet.
+title: "[new card]: "
+labels: ["help wanted", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cards are generated from a separate pipeline, so new cards come in as requests.
+        Please give us enough detail to generate and review one.
+  - type: input
+    id: language
+    attributes:
+      label: Language or ecosystem
+      placeholder: javascript, python, go, ruby, elixir, ...
+    validations:
+      required: true
+  - type: input
+    id: library
+    attributes:
+      label: Library
+      placeholder: express
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The exact version you want covered.
+      placeholder: 5.2.1
+    validations:
+      required: true
+  - type: input
+    id: identifier
+    attributes:
+      label: Package or lockfile identifier
+      description: How the dependency appears in a manifest or lockfile.
+      placeholder: "express (package.json), or the line from package-lock.json"
+    validations:
+      required: false
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: What security topics or common mistakes should the card cover?
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Source links
+      description: Docs, advisories, or source code that would help.
+    validations:
+      required: false

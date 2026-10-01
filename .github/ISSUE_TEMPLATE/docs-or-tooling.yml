@@ -1,0 +1,30 @@
+name: Docs or tooling
+description: Suggest an improvement to the docs, the agent usage guide, or the scripts.
+title: "[docs/tooling]: "
+labels: ["help wanted"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - README
+        - Agent usage guide
+        - Scripts and tooling (scripts/)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What could be better
+      description: Describe the gap or the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What change would you suggest? A rough idea is fine.
+    validations:
+      required: false
